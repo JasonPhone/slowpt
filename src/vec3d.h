@@ -6,10 +6,10 @@
 #include <iostream>
 
 class vec3d {
- private:
  public:
   double e[3];  // internal data
 
+ public:
   vec3d() : e{0, 0, 0} {}
   vec3d(double _e1, double _e2, double _e3) : e{_e1, _e2, _e3} {}
   // getters
