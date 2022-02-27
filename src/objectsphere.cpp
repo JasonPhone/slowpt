@@ -2,12 +2,12 @@
 
 double ObjectSphere::hit_object(const ray& r) const {
   vec3d oc = r.origin() - center_;
-  auto a = dot(r.direction(), r.direction());
-  auto b = 2.0 * dot(oc, r.direction());
-  auto c = dot(oc, oc) - radius_ * radius_;
-  auto delta = b * b - 4 * a * c;
+  auto a = r.direction().norm2();
+  auto half_b = dot(oc, r.direction());
+  auto c = oc.norm2() - radius_ * radius_;
+  auto delta = half_b * half_b - a * c;
   // NOTE: Still the negative t problem
-  return delta < 0 ? -1 : (-b - std::sqrt(delta)) / (2.0 * a);
+  return delta < 0 ? -1 : (-half_b - std::sqrt(delta)) / a;
 }
 vec3d ObjectSphere::surface_normal(const point3d& at) const {
   return unit_vector(at - center_);

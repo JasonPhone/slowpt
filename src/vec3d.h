@@ -17,7 +17,7 @@ class vec3d {
   double y() const { return e[1]; }
   double z() const { return e[2]; }
   // overloads
-  vec3d operator-() { return vec3d{-e[0], -e[1], -e[2]}; }
+  vec3d operator-() const { return vec3d{-e[0], -e[1], -e[2]}; }
   double operator[](int idx) const {
     assert(0 <= idx && idx < 3);
     return e[idx];
@@ -47,8 +47,8 @@ using point3d = vec3d;
 using colorRGB = vec3d;
 
 // utilities
-inline std::ostream& operator<<(std::ostream &out, const vec3d &v) {
-    return out << v.e[0] << " " << v.e[1] << " " << v.e[2];
+inline std::ostream &operator<<(std::ostream &out, const vec3d &v) {
+  return out << v.e[0] << " " << v.e[1] << " " << v.e[2];
 }
 inline vec3d operator+(const vec3d &u, const vec3d &v) {
   return vec3d(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);

@@ -6,10 +6,11 @@ project(slowpt
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(BASIC_CLASSES
+set(BASIC_FILES
   vec3d.h
   colorRGB.h
   ray.h
+  rtutilities.h
 )
 
 set(HITTABLE_OBJ
@@ -25,6 +26,6 @@ set(MAIN_SRC
 
 add_executable(slowpt
   ${MAIN_SRC}
-  ${BASIC_CLASSES}
+  ${BASIC_FILES}
   ${HITTABLE_OBJ}
 )
