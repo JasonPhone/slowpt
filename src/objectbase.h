@@ -4,7 +4,8 @@
 class ObjectBase {
  private:
  public:
-  virtual bool hit_object(const ray& r) const;
+  virtual double hit_object(const ray& r) const;
+  virtual vec3d surface_normal(const point3d& at) const;
 };
 
 #endif

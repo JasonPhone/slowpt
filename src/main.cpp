@@ -8,17 +8,31 @@
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */
+constexpr double INF_D = double(0x3f3f3f3f);
 std::vector<ObjectBase*> objects;
 colorRGB ray_color(const ray& r) {
   /******** Objects ********/
-  for (auto obj : objects) {
-    if (obj->hit_object(r)) return colorRGB{1, 0, 0};
+  auto t = INF_D;
+  int idx = -1;
+  // traverse all objects and find minimum t
+  for (int i = 0; i < objects.size(); i++) {
+    const auto obj = objects[i];
+    auto tmp = obj->hit_object(r);
+    if (0.0 < tmp && tmp < t) {
+      t = tmp;
+      idx = i;
+    }
+  }
+  if (idx != -1) {
+    vec3d N = objects[idx]->surface_normal(r.at(t));
+    // map from [-1, 1]^3 to [0, 1]^3
+    return 0.5 * colorRGB{N.x() + 1, N.y() + 1, N.z() + 1};
   }
   /******** Background ********/
   // background, blue-white gradient
   vec3d unit_dir = unit_vector(r.direction());
   // cast [-1, 1] to [0, 1]
-  double t = 0.5 * (unit_dir.y() + 1.0);
+  t = 0.5 * (unit_dir.y() + 1.0);
   // linear interpolation and magic blue number
   return (1.0 - t) * colorRGB{1.0, 1.0, 1.0} + t * colorRGB{0.5, 0.7, 1.0};
 }
