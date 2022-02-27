@@ -14,8 +14,6 @@ struct hit_record {
 class ObjectBase {
  private:
  public:
-  virtual double hit_object(const ray& r) const;
-  virtual vec3d surface_normal(const point3d& at) const;
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const = 0;
 };

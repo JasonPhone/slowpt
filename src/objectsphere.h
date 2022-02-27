@@ -13,8 +13,6 @@ class ObjectSphere : public ObjectBase {
   ObjectSphere() : ObjectBase{}, center_{}, radius_{0} {}
   ObjectSphere(const vec3d& cent, double r)
       : ObjectBase{}, center_{cent}, radius_{r} {}
-  virtual double hit_object(const ray& r) const override;
-  virtual vec3d surface_normal(const point3d& at) const override;
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
   vec3d center() const;

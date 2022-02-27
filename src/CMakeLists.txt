@@ -15,9 +15,7 @@ set(BASIC_FILES
 
 set(HITTABLE_OBJ
   objectbase.h
-  objectbase.cpp
   objectsphere.h
-  objectsphere.cpp
 )
 
 set(MAIN_SRC
