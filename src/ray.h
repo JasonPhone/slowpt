@@ -2,7 +2,7 @@
 #define RAY_H
 #include "vec3d.h"
 class ray {
- public:
+ private:
   point3d ori;
   vec3d dir;
 

@@ -1,12 +1,20 @@
 #include <iostream>
+#include <vector>
 
 #include "colorRGB.h"
 #include "ray.h"
 #include "vec3d.h"
+#include "objectsphere.h"
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */
+std::vector<ObjectBase*> objects;
 colorRGB ray_color(const ray& r) {
+  /******** Objects ********/
+  for (auto obj : objects) {
+    if (obj->hit_object(r)) return colorRGB{1, 0, 0};
+  }
+  /******** Background ********/
   // background, blue-white gradient
   vec3d unit_dir = unit_vector(r.direction());
   // cast [-1, 1] to [0, 1]
@@ -19,6 +27,10 @@ int main() {
   const double aspect_ratio = 16.0 / 9.0;
   const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
+
+  /******** Objects ********/
+  // init the objects
+  objects.push_back(new ObjectSphere{vec3d{0, 0, -1}, 0.5});
 
   /******** Camera ********/
   double focal_length = 1.0;
