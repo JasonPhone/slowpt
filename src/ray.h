@@ -8,7 +8,11 @@ class ray {
 
  public:
   ray() {}
-  ray(const point3d& _ori, const vec3d& _dir) : ori(_ori), dir(_dir) {}
+  // _dir would be used to generate the _unit_ vector
+  ray(const point3d& _ori, const vec3d& _dir) : ori(_ori){
+    // dir = _dir / _dir.norm();
+    dir = _dir;
+  }
   // getters
   point3d origin() const { return ori; }
   vec3d direction() const { return dir; }

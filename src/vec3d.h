@@ -5,11 +5,25 @@
 #include <cmath>
 #include <iostream>
 
+#include "rtutilities.h"
+
 class vec3d {
  public:
   double e[3];  // internal data
 
  public:
+  // return a random vector in [0, 1)^3
+  inline static vec3d random() {
+    return vec3d{random_double(), random_double(), random_double()};
+  }
+  // return a random vector in [minv, maxv)^3
+  inline static vec3d random(double minv, double maxv) {
+    return vec3d{
+        random_double(minv, maxv),
+        random_double(minv, maxv),
+        random_double(minv, maxv),
+    };
+  }
   vec3d() : e{0, 0, 0} {}
   vec3d(double _e1, double _e2, double _e3) : e{_e1, _e2, _e3} {}
   // getters
@@ -73,5 +87,13 @@ inline vec3d cross(const vec3d &u, const vec3d &v) {
                u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 inline vec3d unit_vector(vec3d v) { return v / v.norm(); }
+// random vector in unit sphere, from the center
+inline vec3d random_in_unit_sphere() {
+  while (true) {
+    auto p = vec3d::random(-1, 1);
+    if (p.norm2() >= 1.0) continue;
+    return p;
+  }
+}
 
 #endif

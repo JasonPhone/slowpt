@@ -12,12 +12,10 @@ const double PI = 3.1415926535897932385;
 
 // functions
 inline double deg_to_rad(double deg) { return deg * PI / 180.0; }
-inline double random_double() {
-  // [0, 1)
-  return rand() / (1.0 + RAND_MAX);
-}
+// return double in [0, 1)
+inline double random_double() { return rand() / (1.0 + RAND_MAX); }
+// return double in [minv, maxv)
 inline double random_double(double minv, double maxv) {
-  // [minv, maxv)
   return minv + (maxv - minv) * random_double();
 }
 inline double clamp(double x, double minv, double maxv) {
