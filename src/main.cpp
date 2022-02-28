@@ -14,7 +14,7 @@ std::vector<ObjectBase*> objects;
 colorRGB ray_color(const ray& r, const ObjectList& world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
-  if (bounce_depth <= 0) return colorRGB{1, 1, 1};
+  if (bounce_depth <= 0) return colorRGB{1, 0, 0};
   // shading are handled by ObjectList
   if (world.hit(r, 0, INF_DBL, rec)) {
     point3d bounce_tgt = rec.p + rec.normal + random_in_unit_sphere();
@@ -34,7 +34,7 @@ int main() {
   std::srand(std::time(nullptr));
   /******** Image ********/
   const double aspect_ratio = 16.0 / 9.0;
-  const int image_w = 400;
+  const int image_w = 800;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
   const int spp = 100;
   const int max_bounce = 20;
