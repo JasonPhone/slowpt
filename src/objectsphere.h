@@ -32,7 +32,8 @@ bool ObjectSphere::hit(const ray& r, double t_min, double t_max,
   auto sqrtd = std::sqrt(delta);
   auto root = (-half_b - sqrtd) / a;
   // make positive t
-  if ((-half_b + sqrtd) / a <= 0) return false;
+  // no need if t_min is an epsilon
+  // if ((-half_b + sqrtd) / a <= 0) return false;
   // from two roots we choose the nearest to camera
   if (root < t_min || t_max < root) {
     root = (-half_b + sqrtd) / a;
