@@ -56,6 +56,11 @@ class vec3d {
   double norm2() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2]; }
   double norm() const { return sqrt(norm2()); }
   void print() const { printf(" (%lf, %lf, %lf) ", e[0], e[1], e[2]); }
+  bool near_zero() const {
+    auto epsilon = 1e-8;
+    return (fabs(e[0]) < epsilon && fabs(e[1]) < epsilon &&
+            fabs(e[2]) < epsilon);
+  }
 };
 using point3d = vec3d;
 using colorRGB = vec3d;
@@ -98,5 +103,6 @@ inline vec3d random_in_unit_sphere() {
 inline vec3d random_unit_vector() {
   return unit_vector((random_in_unit_sphere()));
 }
+vec3d reflect(const vec3d &v, const vec3d &N) { return v - 2 * dot(v, N) * N; }
 
 #endif

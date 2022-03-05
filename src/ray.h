@@ -10,6 +10,7 @@ class ray {
   ray() {}
   // _dir would be used to generate the _unit_ vector
   ray(const point3d& _ori, const vec3d& _dir) : ori(_ori){
+    // no need for unit vector, would straggle the speed
     // dir = _dir / _dir.norm();
     dir = _dir;
   }
