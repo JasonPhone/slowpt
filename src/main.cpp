@@ -18,16 +18,14 @@ colorRGB ray_color(const ray& r, const ObjectList& world, int bounce_depth) {
   // shading are handled by ObjectList
   if (world.hit(r, 0.001, INF_DBL, rec)) {
     // random on sphere
-    point3d bounce_tgt = rec.p + rec.normal + unit_vector(random_in_unit_sphere());
+    // point3d bounce_tgt = rec.p + rec.normal + unit_vector(random_in_unit_sphere());
     // random in sphere
-    // point3d bounce_tgt = rec.p + rec.normal + random_in_unit_sphere();
+    point3d bounce_tgt = rec.p + rec.normal + random_in_unit_sphere();
     return 0.5 *
            ray_color(ray{rec.p, bounce_tgt - rec.p}, world, bounce_depth - 1);
-    // return 0.5 * (rec.normal + colorRGB(1, 1, 1));
   }
   /******** Background ********/
   // background, blue-white gradient
-  return colorRGB{1, 0, 0};
   vec3d unit_dir = unit_vector(r.direction());
   // cast [-1, 1] to [0, 1]
   auto t = 0.5 * (unit_dir.y() + 1.0);

@@ -8,11 +8,12 @@ class ObjectSphere : public ObjectBase {
  private:
   vec3d center_;
   double radius_;
+  std::shared_ptr<MaterialBase> mat_ptr_;
 
  public:
   ObjectSphere() : ObjectBase{}, center_{}, radius_{0} {}
-  ObjectSphere(const vec3d& cent, double r)
-      : ObjectBase{}, center_{cent}, radius_{r} {}
+  ObjectSphere(const vec3d& cent, double r, std::shared_ptr<MaterialBase> m)
+      : ObjectBase{}, center_{cent}, radius_{r}, mat_ptr_{m} {}
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
   vec3d center() const;
@@ -34,6 +35,7 @@ bool ObjectSphere::hit(const ray& r, double t_min, double t_max,
   // make positive t
   // no need if t_min is an epsilon
   // if ((-half_b + sqrtd) / a <= 0) return false;
+
   // from two roots we choose the nearest to camera
   if (root < t_min || t_max < root) {
     root = (-half_b + sqrtd) / a;
@@ -47,6 +49,7 @@ bool ObjectSphere::hit(const ray& r, double t_min, double t_max,
   // only correct for sphere
   vec3d outward_normal = (rec.p - center_) / radius_;
   rec.set_face_normal(r, outward_normal);
+  rec.mat_ptr = mat_ptr_;
 
   return true;
 }
