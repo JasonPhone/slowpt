@@ -73,6 +73,13 @@ class MaterialDielectric : public MaterialBase {
     auto cos_theta = fmin(dot(-unit_in_dir, rec.normal), 1.0);  // for precision
     auto sin_theta = sqrt(1.0 - cos_theta * cos_theta);
     bool can_rafract = (refraction_ratio * sin_theta <= 1.0);
+    // no reflect
+    // if (false) {
+    // no snell
+    // if (reflectance(cos_theta, refraction_ratio) > random_double()) {
+    // no schlick
+    // if (!can_rafract) {
+    // common
     if (!can_rafract || reflectance(cos_theta, refraction_ratio) > random_double()) {
       // cannot refract
       out_dir = reflect(unit_in_dir, rec.normal);

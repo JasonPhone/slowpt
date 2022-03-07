@@ -25,6 +25,7 @@ bool ObjectList::hit(const ray& r, double t_min, double t_max,
   bool hitted = false;
   // decrease the range on this light ray
   auto closest_t = t_max;
+// #pragma omp parallel for schedule(dynamic, 1) private(r)  // OpenMP
   for (const auto& obj : objects) {
     if (obj->hit(r, t_min, closest_t, tmp_rec)) {
       hitted = true;
