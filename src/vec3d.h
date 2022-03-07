@@ -100,6 +100,13 @@ inline vec3d random_in_unit_sphere() {
     return p;
   }
 }
+inline vec3d random_in_unit_disk() {
+  while (true) {
+    auto p = vec3d{random_double(-1, 1), random_double(-1, 1), 0};
+    if (p.norm2() >= 1) continue;
+    return p;
+  }
+}
 inline vec3d random_unit_vector() {
   return unit_vector((random_in_unit_sphere()));
 }

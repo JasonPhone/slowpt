@@ -89,26 +89,20 @@ int main() {
   ObjectList world;
   // ObjectList world = random_scene();
   // materials
-  auto material_ground =
-      std::make_shared<MaterialLambertian>(colorRGB{0.8, 0.8, 0.0});
-  auto material_center = std::make_shared<MaterialLambertian>(colorRGB{0.1, 0.2, 0.5});
+  auto R = cos(PI / 4);
+  auto material_ground = std::make_shared<MaterialLambertian>(colorRGB(0.8, 0.8, 0.0));
+  auto material_center = std::make_shared<MaterialLambertian>(colorRGB(0.1, 0.2, 0.5));
   auto material_left = std::make_shared<MaterialDielectric>(1.5);
-  auto material_right =
-      std::make_shared<MaterialMetal>(colorRGB{0.8, 0.6, 0.2}, 0.0);
-  // objects
-  world.add(std::make_shared<ObjectSphere>(point3d{0.0, -100.5, -1.0}, 100.0,
-                                           material_ground));
-  world.add(std::make_shared<ObjectSphere>(point3d{0.0, 0.0, -1.0}, 0.5,
-                                           material_center));
-  world.add(std::make_shared<ObjectSphere>(point3d{-1.0, 0, -1.0}, 0.5,
-                                           material_left));
-  world.add(std::make_shared<ObjectSphere>(point3d{-1.0, 0, -1.0}, -0.4,
-                                           material_left));
-  world.add(std::make_shared<ObjectSphere>(point3d{1.0, 0.0, -1.0}, 0.5,
-                                           material_right));
+  auto material_right = std::make_shared<MaterialMetal>(colorRGB(0.8, 0.6, 0.2), 0.0);
 
+  world.add(
+      std::make_shared<ObjectSphere>(point3d(0.0, -100.5, -1.0), 100.0, material_ground));
+  world.add(std::make_shared<ObjectSphere>(point3d(0.0, 0.0, -1.0), 0.5, material_center));
+  world.add(std::make_shared<ObjectSphere>(point3d(-1.0, 0.0, -1.0), 0.5, material_left));
+  world.add(std::make_shared<ObjectSphere>(point3d(-1.0, 0.0, -1.0), -0.45, material_left));
+  world.add(std::make_shared<ObjectSphere>(point3d(1.0, 0.0, -1.0), 0.5, material_right));
   /******** Camera ********/
-  Camera cam;
+  Camera cam{point3d{-2, 2, 1}, point3d{0, 0, -1}, vec3d{0, 1, 0}, 20.0, aspect_ratio};
 
   /******** Render ********/
   std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";

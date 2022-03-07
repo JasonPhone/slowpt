@@ -9,22 +9,32 @@ class Camera {
   vec3d hori_side_, vert_side_;
 
  public:
-  Camera() {
-    auto aspect_ratio = 16.0 / 9.0;
-    double focal_length = 1.0;
-    double viewport_h = 2.0;
-    double viewport_w = viewport_h * aspect_ratio;
+  Camera(point3d lookfrom, point3d lookat, vec3d vup, double vfov,
+         double aspect_ratio) {
+    auto theta = deg_to_rad(vfov);  // vertical field of view
+    auto h = tan(theta / 2);
+    auto focal_length = 1.0;
+    auto viewport_h = 2.0 * h;
+    auto viewport_w = viewport_h * aspect_ratio;
+    /** the camera is
+     * located at lookfrom
+     * looking to -w
+     * up direction v
+     * all unit vectors
+     */
+    auto w = unit_vector(lookfrom - lookat);
+    auto u = unit_vector(cross(vup, w));
+    auto v = cross(w, u);
 
-    origin_ = point3d{0, 0, 0};
-    // goes along positive axis
-    hori_side_ = vec3d{viewport_w, 0, 0};
-    vert_side_ = vec3d{0, viewport_h, 0};
+    origin_ = lookfrom;
+    hori_side_ = viewport_w * u;
+    vert_side_ = viewport_h * v;
     // subtract because it's negative z-axis
-    lower_left_ = point3d{origin_ - hori_side_ / 2 - vert_side_ / 2 -
-                          vec3d{0, 0, focal_length}};
+    lower_left_ = origin_ - hori_side_ / 2 - vert_side_ / 2 - w;
   }
-  ray ray_at(double u, double v) {
-    return ray{origin_, lower_left_ + u * hori_side_ + v * vert_side_ - origin_};
+  ray ray_at(double s, double t) {
+    return ray{origin_,
+               lower_left_ + s * hori_side_ + t * vert_side_ - origin_};
   }
 };
 
