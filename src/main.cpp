@@ -102,7 +102,7 @@ int main() {
 
   /******** Objects wolrd ********/
   // ObjectList world;
-  ObjectList world = _scene();
+  ObjectList world = world_scene();
   // materials
   // auto R = cos(PI / 4);
   // auto material_ground = std::make_shared<MaterialLambertian>(colorRGB(0.8,
