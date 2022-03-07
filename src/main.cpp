@@ -57,19 +57,6 @@ ObjectList random_scene() {
   world.add(std::make_shared<ObjectSphere>(point3d(4, 1, 0), 1.0, material3));
   return world;
 }
-ObjectList _scene() {
-  ObjectList world;
-  auto ground_material =
-      std::make_shared<MaterialLambertian>(colorRGB(1.0, 0.75, 0.796));
-  // ground is a huge lembertian sphere
-  world.add(std::make_shared<ObjectSphere>(point3d(0, -1000, 0), 1000,
-                                           ground_material));
-  auto material1 = std::make_shared<MaterialDielectric>(1.5);
-  world.add(std::make_shared<ObjectSphere>(point3d(0, 1, 0), 0.8, material1));
-  world.add(std::make_shared<ObjectSphere>(point3d(-4, 1, 0), 1.0, material1));
-  world.add(std::make_shared<ObjectSphere>(point3d(4, 1, 0), 0.6, material1));
-  return world;
-}
 colorRGB ray_color(const ray& r, const ObjectList& world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
@@ -102,7 +89,7 @@ int main() {
 
   /******** Objects wolrd ********/
   // ObjectList world;
-  ObjectList world = world_scene();
+  ObjectList world = random_scene();
   // materials
   // auto R = cos(PI / 4);
   // auto material_ground = std::make_shared<MaterialLambertian>(colorRGB(0.8,
