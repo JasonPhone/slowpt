@@ -1,6 +1,6 @@
 #ifndef OBJECT_BASE_H
 #define OBJECT_BASE_H
-#include "rtutilities.h"
+#include "../base/rtutilities.h"
 class MaterialBase;
 struct hit_record {
   point3d p;

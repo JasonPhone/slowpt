@@ -3,11 +3,12 @@
 #include <vector>
 
 #include "camera.h"
-#include "colorRGB.h"
+#include "./base/colorRGB.h"
 #include "material.h"
-#include "objectlist.h"
-#include "objectsphere.h"
-#include "rtutilities.h"
+#include "./object/objectbase.h"
+#include "./object/objectsphere.h"
+#include "./object/objectlist.h"
+#include "./base/rtutilities.h"
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */

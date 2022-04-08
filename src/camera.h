@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "rtutilities.h"
+#include "./base/rtutilities.h"
 
 class Camera {
  private:

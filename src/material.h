@@ -1,8 +1,8 @@
 #ifndef MATERIAL_BASE_H
 #define MATERIAL_BASE_H
 
-#include "objectbase.h"
-#include "rtutilities.h"
+#include "./object/objectbase.h"
+#include "./base/rtutilities.h"
 
 class MaterialBase {
  public:

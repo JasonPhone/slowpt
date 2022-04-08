@@ -1,0 +1,43 @@
+{
+    // "clang.completion.enable": true,
+    // "clang.diagnostic.enable": true,
+    // "clang.executable": "clang++",
+    "C_Cpp.suggestSnippets": false,
+    "C_Cpp.autocomplete": "Default",
+    "C_Cpp.clang_format_path": "C:/LLVM/bin/clang-format.exe",
+    "C_Cpp.default.cppStandard": "c++14",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.clang_format_style": "Google",
+    "C_Cpp.intelliSenseCacheSize": 512,
+    // "editor.formatOnType": true,
+    "editor.useTabStops": false,
+    "editor.tabSize": 2,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.snippetSuggestions": "top", // （可选）snippets显示在补全列表顶端，默认是
+    "editor.comments.insertSpace": true,
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
+    "editor.quickSuggestionsDelay": 50,
+    // "editor.fontSize": 100,
+    // "editor.suggest.showSnippets": false,
+    "editor.suggestSelection": "recentlyUsedByPrefix",
+    "[cpp]": {
+        "files.trimTrailingWhitespace": true,
+    },
+    "[c]": {
+        "files.trimTrailingWhitespace": true,
+    },
+    "C_Cpp.dimInactiveRegions": false,
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/src",
+}

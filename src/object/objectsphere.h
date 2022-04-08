@@ -2,8 +2,8 @@
 #define OBJECT_SPHERE_H
 
 #include "objectbase.h"
-#include "ray.h"
-#include "vec3d.h"
+#include "../base/ray.h"
+#include "../base/vec3d.h"
 class ObjectSphere : public ObjectBase {
  private:
   vec3d center_;

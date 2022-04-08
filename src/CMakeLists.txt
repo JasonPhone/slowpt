@@ -7,15 +7,18 @@ project(slowpt
 set(CMAKE_CXX_STANDARD 11)
 
 set(BASIC_FILES
-  vec3d.h
-  colorRGB.h
-  ray.h
-  rtutilities.h
+  ./base/vec3d.h
+  ./base/colorRGB.h
+  ./base/ray.h
+  ./base/rtutilities.h
+  camera.h
+  material.h
 )
 
 set(HITTABLE_OBJ
-  objectbase.h
-  objectsphere.h
+  ./object/objectbase.h
+  ./object/objectlist.h
+  ./object/objectsphere.h
 )
 
 set(MAIN_SRC
