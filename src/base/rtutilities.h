@@ -5,6 +5,8 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+// #include "vec3d.h"
+// #include "ray.h"
 
 // constants
 const double INF_DBL = std::numeric_limits<double>::infinity();
@@ -32,7 +34,5 @@ inline double clamp(double x, double minv, double maxv) {
 }
 
 // common headers
-#include "ray.h"
-#include "vec3d.h"
 
 #endif

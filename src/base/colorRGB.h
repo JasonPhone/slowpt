@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "vec3d.h"
 #include "rtutilities.h"
+#include "vec3d.h"
 // note that primitive colors are in range [0, 1]
 void write_color(std::ostream &out, colorRGB pixel_color, int spp) {
   // the pixel_color is accumulated by SSAA

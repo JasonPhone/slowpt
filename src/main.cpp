@@ -3,12 +3,12 @@
 #include <vector>
 
 #include "camera.h"
-#include "./base/colorRGB.h"
+#include "colorRGB.h"
 #include "material.h"
-#include "./object/objectbase.h"
-#include "./object/objectsphere.h"
-#include "./object/objectlist.h"
-#include "./base/rtutilities.h"
+#include "objectbase.h"
+#include "objectlist.h"
+#include "objectsphere.h"
+#include "rtutilities.h"
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */
@@ -83,7 +83,7 @@ int main() {
   std::srand(std::time(nullptr));
   /******** Image ********/
   const double aspect_ratio = 3.0 / 2.0;
-  const int image_w = 1200;
+  const int image_w = 200;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
   const int spp = 300;
   const int max_bounce = 20;
@@ -134,4 +134,6 @@ int main() {
   }
 
   std::cerr << "\nDone.\n";
+  // std::cout << "hello wolrd" << std::endl;
+  return 0;
 }

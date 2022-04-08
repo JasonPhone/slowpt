@@ -3,8 +3,6 @@
     {
       "name": "Win32",
       "includePath": [
-        "C:/mingw-w64/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include",
-        "${workspaceFolder}/src/"
       ],
       "defines": [
         "_DEBUG",
@@ -15,13 +13,7 @@
       "cStandard": "c11",
       "cppStandard": "c++14",
       "intelliSenseMode": "gcc-x64",
-      "browse": {
-        "path": [
-          "C:/mingw-w64/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include",
-          "${workspaceFolder}/src/"
-        ]
-      },
-      "configurationProvider": "vector-of-bool.cmake-tools"
+      "configurationProvider": "ms-vscode.cmake-tools"
     }
   ],
   "version": 4
