@@ -63,7 +63,7 @@ class vec3d {
   }
 };
 using point3d = vec3d;
-using colorRGB = vec3d;
+using color_rgb = vec3d;
 
 // utilities
 inline std::ostream &operator<<(std::ostream &out, const vec3d &v) {

@@ -2,11 +2,11 @@
 #define OBJECT_BASE_H
 #include "rtutilities.h"
 #include "ray.h"
-class MaterialBase;
+class material_base;
 struct hit_record {
   point3d p;
   vec3d normal;
-  std::shared_ptr<MaterialBase> mat_ptr;
+  std::shared_ptr<material_base> mat_ptr;
   double t;
   bool front_face;
   inline void set_face_normal(const ray& r, const vec3d& outward_normal) {
@@ -14,7 +14,7 @@ struct hit_record {
     normal = front_face ? outward_normal : -outward_normal;
   }
 };
-class ObjectBase {
+class object_base {
  private:
  public:
   virtual bool hit(const ray& r, double t_min, double t_max,

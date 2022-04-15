@@ -6,20 +6,20 @@
 
 #include "objectbase.h"
 
-class ObjectList : public ObjectBase {
+class object_list : public object_base {
  private:
-  std::vector<std::shared_ptr<ObjectBase>> objects;
+  std::vector<std::shared_ptr<object_base>> objects;
 
  public:
-  ObjectList() {}
-  ObjectList(std::shared_ptr<ObjectBase> object) { add(object); }
+  object_list() {}
+  object_list(std::shared_ptr<object_base> object) { add(object); }
   void clear() { objects.clear(); }
-  void add(std::shared_ptr<ObjectBase> obj) { objects.push_back(obj); }
+  void add(std::shared_ptr<object_base> obj) { objects.push_back(obj); }
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
 };
 
-bool ObjectList::hit(const ray& r, double t_min, double t_max,
+bool object_list::hit(const ray& r, double t_min, double t_max,
                      hit_record& rec) const {
   hit_record tmp_rec;
   bool hitted = false;

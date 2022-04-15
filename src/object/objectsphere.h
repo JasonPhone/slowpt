@@ -3,23 +3,23 @@
 
 #include "objectbase.h"
 #include "rtutilities.h"
-class ObjectSphere : public ObjectBase {
+class object_sphere : public object_base {
  private:
   vec3d center_;
   double radius_;
-  std::shared_ptr<MaterialBase> mat_ptr_;
+  std::shared_ptr<material_base> mat_ptr_;
 
  public:
-  ObjectSphere() : ObjectBase{}, center_{}, radius_{0} {}
-  ObjectSphere(const vec3d& cent, double r, std::shared_ptr<MaterialBase> m)
-      : ObjectBase{}, center_{cent}, radius_{r}, mat_ptr_{m} {}
+  object_sphere() : object_base{}, center_{}, radius_{0} {}
+  object_sphere(const vec3d& cent, double r, std::shared_ptr<material_base> m)
+      : object_base{}, center_{cent}, radius_{r}, mat_ptr_{m} {}
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
   vec3d center() const;
   double radius() const;
 };
 
-bool ObjectSphere::hit(const ray& r, double t_min, double t_max,
+bool object_sphere::hit(const ray& r, double t_min, double t_max,
                        hit_record& rec) const {
   vec3d oc = r.origin() - center_;
   auto a = r.direction().norm2();

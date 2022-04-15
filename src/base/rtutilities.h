@@ -21,15 +21,14 @@ inline double random_double(double minv, double maxv) {
   return minv + (maxv - minv) * random_double();
 }
 inline double clamp(double x, double minv, double maxv) {
-  // NOTE: do we really need this?
-  // if (x < minv) {
-  //   // std::cerr << "lower at " << x << std::endl;
-  //   return minv;
-  // }
-  // if (x > maxv) {
-  //   // std::cerr << "higher at " << x << std::endl;
-  //   return maxv;
-  // }
+  if (x < minv) {
+    // std::cerr << "lower at " << x << std::endl;
+    return minv;
+  }
+  if (x > maxv) {
+    // std::cerr << "higher at " << x << std::endl;
+    return maxv;
+  }
   return x;
 }
 

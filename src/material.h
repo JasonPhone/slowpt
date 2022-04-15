@@ -4,20 +4,20 @@
 #include "objectbase.h"
 #include "rtutilities.h"
 
-class MaterialBase {
+class material_base {
  public:
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       colorRGB& attenuation, ray& scattered) const = 0;
+                       color_rgb& attenuation, ray& scattered) const = 0;
 };
 
-class MaterialLambertian : public MaterialBase {
+class material_lambertian : public material_base {
  private:
-  colorRGB albedo_;
+  color_rgb albedo_;
 
  public:
-  MaterialLambertian(const colorRGB& a) : albedo_{a} {}
+  material_lambertian(const color_rgb& a) : albedo_{a} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       colorRGB& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered) const override {
     auto scatter_dir = rec.normal + random_unit_vector();
 
     // test if zero direction
@@ -29,16 +29,16 @@ class MaterialLambertian : public MaterialBase {
   }
 };
 
-class MaterialMetal : public MaterialBase {
+class material_metal : public material_base {
  private:
-  colorRGB albedo_;
+  color_rgb albedo_;
   double fuzz_;
 
  public:
-  MaterialMetal(const colorRGB& a, double f)
+  material_metal(const color_rgb& a, double f)
       : albedo_{a}, fuzz_{f > 1.0 ? 1 : f} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       colorRGB& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
     scattered = ray(rec.p, reflect_dir + fuzz_ * random_unit_vector());
     attenuation = albedo_;
@@ -46,7 +46,7 @@ class MaterialMetal : public MaterialBase {
   }
 };
 
-class MaterialDielectric : public MaterialBase {
+class matetial_dielectric : public material_base {
  private:
   double ir_;
   static double reflectance(double cosine, double ref_idx) {
@@ -57,7 +57,7 @@ class MaterialDielectric : public MaterialBase {
   }
 
  public:
-  MaterialDielectric(double index_of_refraction) : ir_{index_of_refraction} {}
+  matetial_dielectric(double index_of_refraction) : ir_{index_of_refraction} {}
   vec3d refract(const vec3d& uv, const vec3d& N, double r_ratio) const {
     auto cos_theta = fmin(dot(-uv, N), 1.0);  // for precision
     vec3d ref_x = r_ratio * (uv + cos_theta * N);
@@ -65,8 +65,8 @@ class MaterialDielectric : public MaterialBase {
     return ref_x + ref_y;
   }
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       colorRGB& attenuation, ray& scattered) const override {
-    attenuation = colorRGB{1.0, 1.0, 1.0};
+                       color_rgb& attenuation, ray& scattered) const override {
+    attenuation = color_rgb{1.0, 1.0, 1.0};
     double refraction_ratio = rec.front_face ? (1.0 / ir_) : ir_;
     vec3d unit_in_dir = unit_vector(r_in.direction());
     vec3d out_dir;

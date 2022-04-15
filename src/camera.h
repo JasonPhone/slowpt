@@ -4,7 +4,7 @@
 #include "rtutilities.h"
 #include "ray.h"
 
-class Camera {
+class camera {
  private:
   point3d origin_, lower_left_;
   vec3d hori_side_, vert_side_;
@@ -12,7 +12,7 @@ class Camera {
   double lens_radius_;
 
  public:
-  Camera(point3d lookfrom, point3d lookat, vec3d vup, double vfov,
+  camera(point3d lookfrom, point3d lookat, vec3d vup, double vfov,
          double aspect_ratio,
          double aperture,
          double focus_dist) {
