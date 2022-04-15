@@ -19,6 +19,10 @@ ObjectList random_scene() {
   // ground is a huge lembertian sphere
   world.add(std::make_shared<ObjectSphere>(point3d(0, -1000, 0), 1000,
                                            ground_material));
+  auto mat = std::make_shared<MaterialDielectric>(1.5);
+  world.add(std::make_shared<ObjectSphere>(point3d(0, 1, 0), -0.9, mat));
+  world.add(std::make_shared<ObjectSphere>(point3d(0, 1, 0), 1, mat));
+  return world;
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
       auto choose_mat = random_double();
@@ -83,10 +87,10 @@ int main() {
   std::srand(std::time(nullptr));
   /******** Image ********/
   const double aspect_ratio = 3.0 / 2.0;
-  const int image_w = 200;
+  const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
-  const int spp = 300;
-  const int max_bounce = 20;
+  const int spp = 1000;
+  const int max_bounce = 200;
 
   /******** Objects wolrd ********/
   // ObjectList world;
