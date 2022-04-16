@@ -22,7 +22,7 @@ class material_lambertian : public material_base {
 
     // test if zero direction
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
-    scattered = ray(rec.p, scatter_dir);
+    scattered = ray(rec.p, scatter_dir, r_in.time());
     // always scatter, but have an attenuation
     attenuation = albedo_;
     return true;
@@ -40,7 +40,7 @@ class material_metal : public material_base {
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
-    scattered = ray(rec.p, reflect_dir + fuzz_ * random_unit_vector());
+    scattered = ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
     attenuation = albedo_;
     return (dot(rec.normal, scattered.direction()) > 0.0);
   }
@@ -52,8 +52,8 @@ class matetial_dielectric : public material_base {
   static double reflectance(double cosine, double ref_idx) {
     // Schlick's approximation
     auto r0 = (1 - ref_idx) / (1 + ref_idx);
-    r0 = r0 * r0;
-    return r0 + (1 - r0)*pow((1 - cosine), 5);
+    r0 *= r0;
+    return r0 + (1 - r0) * pow((1 - cosine), 5);
   }
 
  public:
@@ -80,7 +80,10 @@ class matetial_dielectric : public material_base {
     // no schlick
     // if (!can_rafract) {
     // common
-    if (!can_rafract || reflectance(cos_theta, refraction_ratio) > random_double()) {
+    if (!can_rafract  // when snell law cannot be solved
+        || reflectance(cos_theta, refraction_ratio) >
+               random_double()  // schlick approximation
+    ) {
       // cannot refract
       out_dir = reflect(unit_in_dir, rec.normal);
     } else {
@@ -88,7 +91,7 @@ class matetial_dielectric : public material_base {
     }
     // out_dir = refract(unit_in_dir, rec.normal, refraction_ratio);
 
-    scattered = ray(rec.p, out_dir);
+    scattered = ray(rec.p, out_dir, r_in.time());
     return true;
   }
 };
