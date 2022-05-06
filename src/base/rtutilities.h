@@ -32,6 +32,4 @@ inline double clamp(double x, double minv, double maxv) {
   return x;
 }
 
-// common headers
-
 #endif

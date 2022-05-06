@@ -1,7 +1,7 @@
 #ifndef OBJECT_BASE_H
 #define OBJECT_BASE_H
-#include "rtutilities.h"
 #include "ray.h"
+#include "rtutilities.h"
 class material_base;
 struct hit_record {
   point3d p;
