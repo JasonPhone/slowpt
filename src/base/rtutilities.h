@@ -5,6 +5,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <cmath>
 // #include "vec3d.h"
 // #include "ray.h"
 

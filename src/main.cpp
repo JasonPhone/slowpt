@@ -9,7 +9,6 @@
 #include "objectlist.h"
 #include "objectsphere.h"
 #include "rtutilities.h"
-#include "aabb.h"
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */
