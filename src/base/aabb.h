@@ -16,12 +16,12 @@ class aabb {
   aabb(point3d const &a, point3d const &b) : min_{a}, max_{b} {}
   point3d min() const;
   point3d max() const;
-  bool hit(ray const &r, double t_min, double t_max);
+  bool hit(ray const &r, double t_min, double t_max) const;
 };
 
 point3d aabb::min() const { return this->min_; }
 point3d aabb::max() const { return this->max_; }
-bool aabb::hit(ray const &r, double t_min, double t_max) {
+bool aabb::hit(ray const &r, double t_min, double t_max) const {
   for (int axis = 0; axis < 3; axis++) {
     auto inv_d = 1 / r.direction()[axis];
     auto t_0 = inv_d * fmin(min_[axis] - r.origin()[axis],

@@ -7,14 +7,14 @@
 #include "objectbase.h"
 
 class object_list : public object_base {
- private:
-  std::vector<std::shared_ptr<object_base>> objects;
+ public:
+  std::vector<std::shared_ptr<object_base>> objects_;
 
  public:
   object_list() {}
   object_list(std::shared_ptr<object_base> object) { add(object); }
-  void clear() { objects.clear(); }
-  void add(std::shared_ptr<object_base> obj) { objects.push_back(obj); }
+  void clear() { objects_.clear(); }
+  void add(std::shared_ptr<object_base> obj) { objects_.push_back(obj); }
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
   virtual bool bounding_box(double tm0, double tm1,
@@ -28,7 +28,7 @@ bool object_list::hit(const ray& r, double t_min, double t_max,
   // decrease the range on this light ray
   auto closest_t = t_max;
   // #pragma omp parallel for schedule(dynamic, 1) private(r)  // OpenMP
-  for (const auto& obj : objects) {
+  for (const auto& obj : objects_) {
     if (obj->hit(r, t_min, closest_t, tmp_rec)) {
       hitted = true;
       closest_t = tmp_rec.t;
@@ -38,10 +38,10 @@ bool object_list::hit(const ray& r, double t_min, double t_max,
   return hitted;
 }
 bool object_list::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
-  if (objects.empty()) return false;
+  if (objects_.empty()) return false;
   aabb tmp_box;
   bool first_box = true;
-  for (auto const& obj : objects) {
+  for (auto const& obj : objects_) {
     if (obj->bounding_box(tm0, tm1, tmp_box) == false) return false;
     buf_aabb = first_box ? tmp_box : surrounding_aabb(tmp_box, buf_aabb);
     first_box = false;

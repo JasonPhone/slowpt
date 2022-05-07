@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 
+#include "bvh.h"
 #include "camera.h"
 #include "colorRGB.h"
 #include "material.h"
@@ -69,7 +70,7 @@ object_list random_scene() {
                                             0.0, 1.0, 1.0, material3));
   return world;
 }
-color_rgb ray_color(const ray& r, const object_list& world, int bounce_depth) {
+color_rgb ray_color(ray const& r, object_base const& world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
   if (bounce_depth <= 0) return color_rgb{0, 0, 0};
@@ -92,7 +93,7 @@ color_rgb ray_color(const ray& r, const object_list& world, int bounce_depth) {
 }
 int main() {
   std::srand(std::time(nullptr));
-  /******** Image ********/
+  /******** Image config ********/
   const double aspect_ratio = 16.0 / 9.0;
   const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
@@ -126,13 +127,15 @@ int main() {
   vec3d vup{0, 1, 0};
   auto dist_to_focus = 10.0;
   auto aperture = 0.1;
-  camera cam{lookfrom, lookat,        vup, 20, aspect_ratio,
-             aperture, dist_to_focus, 0.0, 1.0};
+  auto apt_open = 0.0, apt_close = 1.0;
+  camera cam{lookfrom, lookat,        vup,      20,       aspect_ratio,
+             aperture, dist_to_focus, apt_open, apt_close};
 
   /******** Render ********/
+  bvh_node world_bvh{world, apt_open, apt_close};
   std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";
   for (int i = image_h - 1; i >= 0; i--) {
-    std::cerr << "\rScanlines remaining: " << i << ' ' << std::flush;
+    std::cerr << "\rScanlines remaining: " << i << "/" << image_h << std::flush;
     for (int j = 0; j < image_w; j++) {
       color_rgb pixel_color{0, 0, 0};
       for (int s = 0; s < spp; s++) {
