@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "rtutilities.h"
+#include "rtutil.h"
 #include "vec3d.h"
 // note that primitive colors are in range [0, 1]
 void write_color(std::ostream &out, color_rgb pixel_color, int spp) {

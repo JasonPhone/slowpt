@@ -4,7 +4,7 @@
 #include "objectbase.h"
 #include "objectlist.h"
 #include "ray.h"
-#include "rtutilities.h"
+#include "rtutil.h"
 
 inline bool box_compare(std::shared_ptr<object_base> const a,
                         std::shared_ptr<object_base> const b, int axis) {

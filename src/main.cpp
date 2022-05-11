@@ -1,5 +1,6 @@
 #include <ctime>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include "bvh.h"
@@ -9,7 +10,7 @@
 #include "objectbase.h"
 #include "objectlist.h"
 #include "objectsphere.h"
-#include "rtutilities.h"
+#include "rtutil.h"
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */
@@ -21,10 +22,19 @@ object_list random_scene() {
   world.add(std::make_shared<object_sphere>(point3d{0, -1000, 0},
                                             point3d{0, -1000, 0}, 0.0, 1.0,
                                             1000, ground_material));
-  // auto mat = std::make_shared<matetial_dielectric>(1.5);
-  // world.add(std::make_shared<object_sphere>(point3d(0, 1, 0), -0.9, mat));
-  // world.add(std::make_shared<object_sphere>(point3d(0, 1, 0), 1, mat));
-  // return world;
+  // three big balls
+  auto material1 = std::make_shared<matetial_dielectric>(1.5);
+  world.add(std::make_shared<object_sphere>(point3d{0, 1, 0}, point3d{0, 1, 0},
+                                            0.0, 1.0, 1.0, material1));
+  auto material2 =
+      std::make_shared<material_lambertian>(color_rgb(0.4, 0.2, 0.1));
+  world.add(std::make_shared<object_sphere>(
+      point3d{-4, 1, 0}, point3d{-4, 1, 0}, 0.0, 1.0, 1.0, material2));
+  auto material3 =
+      std::make_shared<material_metal>(color_rgb(0.7, 0.6, 0.5), 0.0);
+  world.add(std::make_shared<object_sphere>(point3d{4, 1, 0}, point3d{4, 1, 0},
+                                            0.0, 1.0, 1.0, material3));
+  return world;
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
       auto choose_mat = random_double();
@@ -57,17 +67,6 @@ object_list random_scene() {
       }
     }
   }
-  auto material1 = std::make_shared<matetial_dielectric>(1.5);
-  world.add(std::make_shared<object_sphere>(point3d{0, 1, 0}, point3d{0, 1, 0},
-                                            0.0, 1.0, 1.0, material1));
-  auto material2 =
-      std::make_shared<material_lambertian>(color_rgb(0.4, 0.2, 0.1));
-  world.add(std::make_shared<object_sphere>(
-      point3d{-4, 1, 0}, point3d{-4, 1, 0}, 0.0, 1.0, 1.0, material2));
-  auto material3 =
-      std::make_shared<material_metal>(color_rgb(0.7, 0.6, 0.5), 0.0);
-  world.add(std::make_shared<object_sphere>(point3d{4, 1, 0}, point3d{4, 1, 0},
-                                            0.0, 1.0, 1.0, material3));
   return world;
 }
 color_rgb ray_color(ray const& r, object_base const& world, int bounce_depth) {
@@ -97,8 +96,8 @@ int main() {
   const double aspect_ratio = 16.0 / 9.0;
   const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
-  const int spp = 1000;
-  const int max_bounce = 50;
+  const int spp = 10;
+  const int max_bounce = 5;
 
   /******** Objects wolrd ********/
   // object_list world;
@@ -135,14 +134,14 @@ int main() {
   bvh_node world_bvh{world, apt_open, apt_close};
   std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";
   for (int i = image_h - 1; i >= 0; i--) {
-    std::cerr << "\rScanlines remaining: " << i << "/" << image_h << std::flush;
+    std::cerr << "\rScanlines remaining: " << std::setw(3) << i << "/" << image_h << std::flush;
     for (int j = 0; j < image_w; j++) {
       color_rgb pixel_color{0, 0, 0};
       for (int s = 0; s < spp; s++) {
         auto u = (j + random_double()) / (image_w - 1);
         auto v = (i + random_double()) / (image_h - 1);
         ray r = cam.ray_at(u, v);
-        pixel_color += ray_color(r, world, max_bounce);
+        pixel_color += ray_color(r, world_bvh, max_bounce);
       }
       write_color(std::cout, pixel_color, spp);
     }

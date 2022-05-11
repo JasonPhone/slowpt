@@ -2,7 +2,7 @@
 #define OBJECT_SPHERE_H
 
 #include "objectbase.h"
-#include "rtutilities.h"
+#include "rtutil.h"
 #include "aabb.h"
 class object_sphere : public object_base {
  private:

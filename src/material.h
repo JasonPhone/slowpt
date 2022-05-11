@@ -2,7 +2,7 @@
 #define MATERIAL_BASE_H
 
 #include "objectbase.h"
-#include "rtutilities.h"
+#include "rtutil.h"
 
 class material_base {
  public:

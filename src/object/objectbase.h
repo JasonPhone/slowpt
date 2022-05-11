@@ -2,7 +2,7 @@
 #define OBJECT_BASE_H
 #include "aabb.h"
 #include "ray.h"
-#include "rtutilities.h"
+#include "rtutil.h"
 class material_base;
 struct hit_record {
   point3d p;
