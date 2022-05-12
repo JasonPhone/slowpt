@@ -19,6 +19,8 @@ class object_list : public object_base {
                    hit_record& rec) const override;
   virtual bool bounding_box(double tm0, double tm1,
                             aabb& buf_aabb) const override;
+  virtual void get_uv(double const t, point3d const& p, double& u,
+                      double& v) const override;
 };
 
 bool object_list::hit(const ray& r, double t_min, double t_max,
@@ -48,5 +50,9 @@ bool object_list::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
   }
   return true;
 }
-
+void object_list::get_uv(double const t, point3d const& p, double& u,
+                         double& v) const {
+  // just a placeholder
+  std::cerr << "object_list::get_uv: This class cannot get uv.\n";
+}
 #endif

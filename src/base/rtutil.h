@@ -9,10 +9,12 @@
 #include <memory>
 // #include "vec3d.h"
 // #include "ray.h"
+using std::shared_ptr;
+using std::make_shared;
 
 // constants
-const double INF_DBL = std::numeric_limits<double>::infinity();
-const double PI = 3.1415926535897932385;
+constexpr double INF_DBL = std::numeric_limits<double>::infinity();
+constexpr double PI = 3.1415926535897932385;
 
 // functions
 // degree to radius

@@ -1,6 +1,6 @@
 #include <ctime>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <vector>
 
 #include "bvh.h"
@@ -11,29 +11,28 @@
 #include "objectlist.h"
 #include "objectsphere.h"
 #include "rtutil.h"
+#include "textures.h"
 /* encoding issue
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 */
 object_list random_scene() {
   object_list world;
-  auto ground_material =
-      std::make_shared<material_lambertian>(color_rgb(1.0, 0.75, 0.796));
+  auto checker_txt = make_shared<checker_texture>(color_rgb{1.0, 0.75, 0.796},
+                                                  color_rgb{1.0, 0.9, 0.94});
   // ground is a huge lembertian sphere
-  world.add(std::make_shared<object_sphere>(point3d{0, -1000, 0},
-                                            point3d{0, -1000, 0}, 0.0, 1.0,
-                                            1000, ground_material));
+  world.add(make_shared<object_sphere>(
+      point3d{0, -1000, 0}, point3d{0, -1000, 0}, 0.0, 1.0, 1000,
+      make_shared<material_lambertian>(checker_txt)));
   // three big balls
-  auto material1 = std::make_shared<matetial_dielectric>(1.5);
-  world.add(std::make_shared<object_sphere>(point3d{0, 1, 0}, point3d{0, 1, 0},
-                                            0.0, 1.0, 1.0, material1));
-  auto material2 =
-      std::make_shared<material_lambertian>(color_rgb(0.4, 0.2, 0.1));
-  world.add(std::make_shared<object_sphere>(
-      point3d{-4, 1, 0}, point3d{-4, 1, 0}, 0.0, 1.0, 1.0, material2));
-  auto material3 =
-      std::make_shared<material_metal>(color_rgb(0.7, 0.6, 0.5), 0.0);
-  world.add(std::make_shared<object_sphere>(point3d{4, 1, 0}, point3d{4, 1, 0},
-                                            0.0, 1.0, 1.0, material3));
+  auto material1 = make_shared<matetial_dielectric>(1.5);
+  world.add(make_shared<object_sphere>(point3d{0, 1, 0}, point3d{0, 1, 0}, 0.0,
+                                       1.0, 1.0, material1));
+  auto material2 = make_shared<material_lambertian>(color_rgb(0.4, 0.2, 0.1));
+  world.add(make_shared<object_sphere>(point3d{-4, 1, 0}, point3d{-4, 1, 0},
+                                       0.0, 1.0, 1.0, material2));
+  auto material3 = make_shared<material_metal>(color_rgb(0.7, 0.6, 0.5), 0.0);
+  world.add(make_shared<object_sphere>(point3d{4, 1, 0}, point3d{4, 1, 0}, 0.0,
+                                       1.0, 1.0, material3));
   return world;
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
@@ -41,28 +40,28 @@ object_list random_scene() {
       point3d center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
       // make sure not overlap big spheres
       if ((center - point3d(4, 0.2, 0)).norm() > 0.9) {
-        std::shared_ptr<material_base> sphere_material;
+        shared_ptr<material_base> sphere_material;
         if (choose_mat < 0.3) {
           // diffuse
           auto albedo = color_rgb::random() * color_rgb::random();
-          sphere_material = std::make_shared<material_lambertian>(albedo);
+          sphere_material = make_shared<material_lambertian>(albedo);
           auto center2 = center + vec3d{0, random_double(0, 0.5), 0};
-          world.add(std::make_shared<object_sphere>(center, center2, 0.0, 1.0,
-                                                    0.2, sphere_material));
+          world.add(make_shared<object_sphere>(center, center2, 0.0, 1.0, 0.2,
+                                               sphere_material));
         } else if (choose_mat < 0.6) {
           // metal
           auto albedo = color_rgb::random(0.5, 1);
           auto fuzz = random_double(0, 0.5);
-          sphere_material = std::make_shared<material_metal>(albedo, fuzz);
+          sphere_material = make_shared<material_metal>(albedo, fuzz);
           auto center2 = center + vec3d{0, random_double(0, 0.5), 0};
-          world.add(std::make_shared<object_sphere>(center, center2, 0.0, 1.0,
-                                                    0.2, sphere_material));
+          world.add(make_shared<object_sphere>(center, center2, 0.0, 1.0, 0.2,
+                                               sphere_material));
         } else {
           // glass
-          sphere_material = std::make_shared<matetial_dielectric>(1.5);
+          sphere_material = make_shared<matetial_dielectric>(1.5);
           auto center2 = center + vec3d{0, random_double(0, 0.5), 0};
-          world.add(std::make_shared<object_sphere>(center, center2, 0.0, 1.0,
-                                                    0.2, sphere_material));
+          world.add(make_shared<object_sphere>(center, center2, 0.0, 1.0, 0.2,
+                                               sphere_material));
         }
       }
     }
@@ -94,32 +93,14 @@ int main() {
   std::srand(std::time(nullptr));
   /******** Image config ********/
   const double aspect_ratio = 16.0 / 9.0;
-  const int image_w = 400;
+  const int image_w = 640;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
-  const int spp = 10;
-  const int max_bounce = 5;
+  const int spp = 1000;
+  const int max_bounce = 10;
 
   /******** Objects wolrd ********/
   // object_list world;
   object_list world = random_scene();
-  // materials
-  // auto R = cos(PI / 4);
-  // auto material_ground = std::make_shared<MaterialLambertian>(color_rgb(0.8,
-  // 0.8, 0.0)); auto material_center =
-  // std::make_shared<MaterialLambertian>(color_rgb(0.1, 0.2, 0.5)); auto
-  // material_left = std::make_shared<MaterialDielectric>(1.5); auto
-  // material_right = std::make_shared<MaterialMetal>(color_rgb(0.8, 0.6, 0.2),
-  // 0.0);
-
-  // world.add(
-  //     std::make_shared<object_sphere>(point3d(0.0, -100.5, -1.0), 100.0,
-  //     material_ground));
-  // world.add(std::make_shared<object_sphere>(point3d(0.0, 0.0, -1.0), 0.5,
-  // material_center)); world.add(std::make_shared<object_sphere>(point3d(-1.0,
-  // 0.0, -1.0), 0.5, material_left));
-  // world.add(std::make_shared<object_sphere>(point3d(-1.0, 0.0, -1.0), -0.45,
-  // material_left)); world.add(std::make_shared<object_sphere>(point3d(1.0,
-  // 0.0, -1.0), 0.5, material_right));
   /******** Camera ********/
   point3d lookfrom{13, 2, 3};
   point3d lookat{0, 0, 0};
@@ -134,7 +115,8 @@ int main() {
   bvh_node world_bvh{world, apt_open, apt_close};
   std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";
   for (int i = image_h - 1; i >= 0; i--) {
-    std::cerr << "\rScanlines remaining: " << std::setw(3) << i << "/" << image_h << std::flush;
+    std::cerr << "\rScanlines remaining: " << std::setw(3) << i << "/"
+              << image_h << std::flush;
     for (int j = 0; j < image_w; j++) {
       color_rgb pixel_color{0, 0, 0};
       for (int s = 0; s < spp; s++) {

@@ -8,6 +8,7 @@ project(slowpt
 include_directories(
   base
   object
+  appearance
 )
 
 set(MAIN_SRC

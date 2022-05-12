@@ -47,6 +47,8 @@ class bvh_node : public object_base {
                    hit_record &rec) const override;
   virtual bool bounding_box(double tm0, double tm1,
                             aabb &buf_aabb) const override;
+  virtual void get_uv(double const t, point3d const &p, double &u,
+                      double &v) const override;
 };
 
 bool bvh_node::hit(ray const &r, double t_min, double t_max,
@@ -101,5 +103,10 @@ bvh_node::bvh_node(std::vector<std::shared_ptr<object_base>> &leaf_objects,
       !right_->bounding_box(time0, time1, box_right))
     std::cerr << "bvh_node::bvh_node: Missing bounding box when merging.\n";
   self_box_ = surrounding_aabb(box_left, box_right);
+}
+void bvh_node::get_uv(double const t, point3d const &p, double &u,
+                      double &v) const {
+  // placeholder
+  std::cerr << "bvh_node::get_uv: This class cannot get uv.\n";
 }
 #endif

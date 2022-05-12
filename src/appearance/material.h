@@ -3,6 +3,7 @@
 
 #include "objectbase.h"
 #include "rtutil.h"
+#include "textures.h"
 
 class material_base {
  public:
@@ -12,10 +13,14 @@ class material_base {
 
 class material_lambertian : public material_base {
  private:
-  color_rgb albedo_;
+  std::shared_ptr<texture> albedo_;
 
  public:
-  material_lambertian(const color_rgb& a) : albedo_{a} {}
+  material_lambertian(color_rgb const& c)
+      : albedo_{std::make_shared<solid_texture>(c)} {}
+
+  material_lambertian(std::shared_ptr<texture> t) : albedo_{t} {}
+
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
     auto scatter_dir = rec.normal + random_unit_vector();
@@ -24,7 +29,7 @@ class material_lambertian : public material_base {
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
     scattered = ray(rec.p, scatter_dir, r_in.time());
     // always scatter, but have an attenuation
-    attenuation = albedo_;
+    attenuation = albedo_->value(rec.u, rec.v, rec.p);
     return true;
   }
 };
@@ -40,7 +45,8 @@ class material_metal : public material_base {
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
-    scattered = ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
+    scattered =
+        ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
     attenuation = albedo_;
     return (dot(rec.normal, scattered.direction()) > 0.0);
   }

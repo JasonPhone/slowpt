@@ -30,17 +30,18 @@ class object_sphere : public object_base {
                    hit_record& rec) const override;
   virtual bool bounding_box(double tm0, double tm1,
                             aabb& buf_aabb) const override;
+  virtual void get_uv(double const t, point3d const &p, double &u, double &v) const override;
   vec3d center(double time) const;
   double radius() const;
 };
 
 bool object_sphere::hit(const ray& r, double t_min, double t_max,
                         hit_record& rec) const {
-  vec3d oc = r.origin() - center(r.time());
+  vec3d oc = r.origin() - center(r.time()); // ray origin to sphere center
+  // solve the intersect equation
   auto a = r.direction().norm2();
   auto half_b = dot(oc, r.direction());
   auto c = oc.norm2() - radius_ * radius_;
-
   auto delta = half_b * half_b - a * c;
   if (delta < 0) return false;
 
@@ -57,13 +58,15 @@ bool object_sphere::hit(const ray& r, double t_min, double t_max,
       // still not in range
       return false;
   }
-  // record the hit
+  /** record the hit **/
   rec.t = root;
   rec.p = r.at(root);
-  // only correct for sphere
+  // NOTE: only correct for sphere
   vec3d outward_normal = (rec.p - center(r.time())) / radius_;
   rec.set_face_normal(r, outward_normal);
   rec.mat_ptr = mat_ptr_;
+  // get texture
+  this->get_uv(rec.t, outward_normal, rec.u, rec.v);
 
   return true;
 }
@@ -85,4 +88,21 @@ vec3d object_sphere::center(double time) const {
          ((time - time0_) / (time1_ - time0_)) * (center1_ - center0_);
 }
 double object_sphere::radius() const { return this->radius_; }
+void object_sphere::get_uv(double const t, point3d const &p, double &u, double &v) const {
+  /**
+   * u (longtitude) v (latitude) coordinate is set as:
+   *  a point on a unit sphere can be located as (theta, phi)
+   *  where theta is angle from -Y axis up to Y axis,
+   *  phi is angle from -X axis, to +Z, +X, -Z, then back to -X.
+   *  and u, v are normalized theta, phi:
+   *    v = theta / pi, u = phi / 2pi
+   *  convert from xyz coordinate:
+   *    theta = acos(-y), phi = atan2(-z, x) + pi
+   * NOTE: this procedure uses surface normal to calculate uv, so
+   */
+  auto theta = acos(-p.y());
+  auto phi = atan2(-p.z(), p.x()) + PI;
+  u = phi / (2 * PI);
+  v = theta / PI;
+}
 #endif
