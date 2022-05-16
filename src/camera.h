@@ -14,7 +14,7 @@ class camera {
 
  public:
   camera(point3d lookfrom, point3d lookat, vec3d vup,
-         double vfov,  // vertical fov
+         double vfov,  // vertical field of view
          double aspect_ratio,
          double aperture,  // d of aperture
          double focus_dist, double open_tm = 0.0, double close_tm = 0.0) {

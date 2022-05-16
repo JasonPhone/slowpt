@@ -13,7 +13,10 @@
 #include "rtutil.h"
 #include "textures.h"
 /* encoding issue
+in windows
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
+in linux
+./slowpt > out.ppm
 */
 object_list random_scene() {
   object_list world;
@@ -93,9 +96,9 @@ int main() {
   std::srand(std::time(nullptr));
   /******** Image config ********/
   const double aspect_ratio = 16.0 / 9.0;
-  const int image_w = 640;
+  const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
-  const int spp = 1000;
+  const int spp = 500;
   const int max_bounce = 10;
 
   /******** Objects wolrd ********/
@@ -108,7 +111,8 @@ int main() {
   auto dist_to_focus = 10.0;
   auto aperture = 0.1;
   auto apt_open = 0.0, apt_close = 1.0;
-  camera cam{lookfrom, lookat,        vup,      20,       aspect_ratio,
+  auto vfov = 20.0;
+  camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
              aperture, dist_to_focus, apt_open, apt_close};
 
   /******** Render ********/

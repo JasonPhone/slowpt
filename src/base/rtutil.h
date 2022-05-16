@@ -29,6 +29,9 @@ inline double random_double(double minv, double maxv) {
 inline int random_int(int minv, int maxv) {
   return static_cast<int>(random_double(minv, maxv));
 }
+/**
+ * @return value x in [minv, maxv]
+ */
 inline double clamp(double x, double minv, double maxv) {
   if (x < minv) {
     // std::cerr << "lower at " << x << std::endl;
