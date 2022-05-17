@@ -71,6 +71,18 @@ object_list random_scene() {
   }
   return world;
 }
+object_list two_spheres() {
+  object_list objects;
+  auto checker = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
+                                              color_rgb{0.9, 0.9, 0.9});
+  objects.add(make_shared<object_sphere>(
+      point3d{0, -10, 0}, point3d{0, -10, 0}, 0.0, 1.0, 10,
+      make_shared<material_lambertian>(checker)));
+  objects.add(make_shared<object_sphere>(
+      point3d{0, 10, 0}, point3d{0, 10, 0}, 0.0, 1.0, 10,
+      make_shared<material_lambertian>(checker)));
+  return objects;
+}
 color_rgb ray_color(ray const& r, object_base const& world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
@@ -79,18 +91,24 @@ color_rgb ray_color(ray const& r, object_base const& world, int bounce_depth) {
   if (world.hit(r, 0.001, INF_DBL, rec)) {
     ray scattered;
     color_rgb attenuation;
-    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
       return attenuation * ray_color(scattered, world, bounce_depth - 1);
-    }
-    return color_rgb{0, 0, 0};
+    else
+      return color_rgb{0, 0, 0};
   }
   /******** Background ********/
-  // background, blue-white gradient
+  return color_rgb{1, 1, 1}; // pure white background
+  /** background, blue-white gradient
+   * NOTE: this sky simulation will affect
+   * tone of the whole image in recursion
+   */
+  /*
   vec3d unit_dir = unit_vector(r.direction());
   // cast [-1, 1] to [0, 1]
   auto t = 0.5 * (unit_dir.y() + 1.0);
   // linear interpolation of magic blue number
   return (1.0 - t) * color_rgb{1.0, 1.0, 1.0} + t * color_rgb{0.7, 0.7, 1.0};
+  */
 }
 int main() {
   std::srand(std::time(nullptr));
@@ -103,7 +121,7 @@ int main() {
 
   /******** Objects wolrd ********/
   // object_list world;
-  object_list world = random_scene();
+  object_list world;
   /******** Camera ********/
   point3d lookfrom{13, 2, 3};
   point3d lookat{0, 0, 0};
@@ -112,6 +130,24 @@ int main() {
   auto aperture = 0.1;
   auto apt_open = 0.0, apt_close = 1.0;
   auto vfov = 20.0;
+  switch (2) {
+    case 1:
+      world = random_scene();
+      lookfrom = point3d(13, 2, 3);
+      lookat = point3d(0, 0, 0);
+      vfov = 20.0;
+      aperture = 0.1;
+      break;
+
+    case 2:
+      world = two_spheres();
+      lookfrom = point3d(13, 2, 3);
+      lookat = point3d(0, 0, 0);
+      vfov = 20.0;
+      break;
+    default:
+      world = object_list{};
+  }
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
              aperture, dist_to_focus, apt_open, apt_close};
 
@@ -134,6 +170,5 @@ int main() {
   }
 
   std::cerr << "\nDone.\n";
-  // std::cout << "hello wolrd" << std::endl;
   return 0;
 }
