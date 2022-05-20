@@ -26,7 +26,7 @@ class solid_texture : public texture {
   solid_texture(double r, double g, double b)
       : solid_texture{color_rgb{r, g, b}} {}
   virtual color_rgb value(double u, double v, point3d const& p) const override {
-    return this->color_value_;
+    return color_value_;
   }
 };
 

@@ -26,18 +26,15 @@ object_list random_scene() {
                                                    color_rgb{0.9, 0.9, 0.9});
   // ground is a huge lembertian sphere
   world.add(make_shared<sphere_object>(
-      point3d{0, -1000, 0}, point3d{0, -1000, 0}, 0.0, 1.0, 1000,
+      point3d{0, -1000, 0}, 1000,
       make_shared<lambertian_material>(checker_txt1)));
   // three big balls
   auto material1 = make_shared<dielectric_material>(1.5);
-  world.add(make_shared<sphere_object>(point3d{0, 1, 0}, point3d{0, 1, 0}, 0.0,
-                                       1.0, 1.0, material1));
+  world.add(make_shared<sphere_object>(point3d{0, 1, 0}, 1.0, material1));
   auto material2 = make_shared<lambertian_material>(color_rgb(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere_object>(point3d{-4, 1, 0}, point3d{-4, 1, 0},
-                                       0.0, 1.0, 1.0, material2));
-  auto material3 = make_shared<metal_material>(checker_txt2, 0.0);
-  world.add(make_shared<sphere_object>(point3d{4, 1, 0}, point3d{4, 1, 0}, 0.0,
-                                       1.0, 1.0, material3));
+  world.add(make_shared<sphere_object>(point3d{-4, 1, 0}, 1.0, material2));
+  auto material3 = make_shared<metal_material>(color_rgb{1, 1, 1}, 0.0);
+  world.add(make_shared<sphere_object>(point3d{4, 1, 0}, 1.0, material3));
   return world;
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
@@ -78,11 +75,9 @@ object_list two_spheres() {
   auto checker = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
                                               color_rgb{0.9, 0.9, 0.9});
   objects.add(make_shared<sphere_object>(
-      point3d{0, -10, 0}, point3d{0, -10, 0}, 0.0, 1.0, 10,
-      make_shared<lambertian_material>(checker)));
+      point3d{0, -10, 0}, 10, make_shared<lambertian_material>(checker)));
   objects.add(make_shared<sphere_object>(
-      point3d{0, 10, 0}, point3d{0, 10, 0}, 0.0, 1.0, 10,
-      make_shared<lambertian_material>(checker)));
+      point3d{0, 10, 0}, 10, make_shared<lambertian_material>(checker)));
   return objects;
 }
 object_list two_perlin_spheres() {
@@ -96,19 +91,25 @@ object_list two_perlin_spheres() {
 
   return objects;
 }
+object_list one_sphere() {
+  object_list objects;
+  auto mat = make_shared<lambertian_material>(color_rgb{1, 1, 1});
+  objects.add(make_shared<sphere_object>(point3d{0, 0, 0}, 1, mat));
+  return objects;
+}
 color_rgb ray_color(ray const& r, base_object const& world, int bounce_depth) {
   /******** Objects ********/
-  // hit_record rec;
-  // if (bounce_depth <= 0) return color_rgb{0, 0, 0};
-  // // shading are handled by object_list
-  // if (world.hit(r, 0.001, INF_DBL, rec)) {
-  //   ray scattered;
-  //   color_rgb attenuation;
-  //   if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-  //     return attenuation * ray_color(scattered, world, bounce_depth - 1);
-  //   else
-  //     return color_rgb{0, 0, 0};
-  // }
+  hit_record rec;
+  if (bounce_depth <= 0) return color_rgb{0, 0, 0};
+  // shading are handled by object_list
+  if (world.hit(r, 0.001, INF_DBL, rec)) {
+    ray scattered;
+    color_rgb attenuation;
+    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+      return attenuation * ray_color(scattered, world, bounce_depth - 1);
+    else
+      return color_rgb{0, 0, 0};
+  }
   /******** Background ********/
   // return color_rgb{1, 1, 1};  // pure white background
   /** background, blue-white gradient
@@ -119,7 +120,7 @@ color_rgb ray_color(ray const& r, base_object const& world, int bounce_depth) {
   // cast [-1, 1] to [0, 1]
   auto t = 0.5 * (unit_dir.y() + 1.0);
   // linear interpolation of magic blue number
-  return (1.0 - t) * color_rgb{1.0, 1.0, 1.0} + t * color_rgb{0.5, 0.7, 1.0};
+  return (1.0 - t) * color_rgb{1.0, 1.0, 1.0} + t * color_rgb{0.7, 0.7, 1.0};
 }
 int main() {
   std::srand(std::time(nullptr));
@@ -128,7 +129,7 @@ int main() {
   const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
   const int spp = 500;
-  const int max_bounce = 10;
+  const int max_bounce = 20;
 
   /******** Objects wolrd ********/
   // object_list world;
@@ -138,10 +139,10 @@ int main() {
   point3d lookat{0, 0, 0};
   vec3d vup{0, 1, 0};
   auto dist_to_focus = 10.0;
-  auto aperture = 0.1;
+  auto aperture = 0.0;
   auto apt_open = 0.0, apt_close = 1.0;
-  auto vfov = 20.0;
-  switch (0) {
+  auto vfov = 40.0;
+  switch (2) {
     case 1:
       world = random_scene();
       lookfrom = point3d(13, 2, 3);
@@ -165,7 +166,7 @@ int main() {
       break;
 
     default:
-      world = object_list{};
+      world = one_sphere();
   }
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
              aperture, dist_to_focus, apt_open, apt_close};

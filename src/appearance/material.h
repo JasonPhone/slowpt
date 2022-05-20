@@ -29,7 +29,7 @@ class lambertian_material : public base_material {
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
     scattered = ray(rec.p, scatter_dir, r_in.time());
     // always scatter, but have an attenuation
-    attenuation = albedo_->value(rec.u, rec.v, rec.p) * random_double(0, 1);
+    attenuation = albedo_->value(rec.u, rec.v, rec.p);
     return true;
   }
 };

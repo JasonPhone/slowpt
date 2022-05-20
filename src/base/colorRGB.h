@@ -14,9 +14,7 @@ void write_color(std::ostream &out, color_rgb pixel_color, int spp) {
   auto b = pixel_color.z();
   // average
   auto scale = 1.0 / spp;
-  // r = (scale * r);
-  // g = (scale * g);
-  // b = (scale * b);
+  // gamma
   r = std::sqrt(scale * r);
   g = std::sqrt(scale * g);
   b = std::sqrt(scale * b);
