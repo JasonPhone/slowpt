@@ -1,58 +1,60 @@
 #ifndef MATERIAL_BASE_H
 #define MATERIAL_BASE_H
 
-#include "objectbase.h"
+#include "noise.h"
+#include "baseobject.h"
 #include "rtutil.h"
-#include "textures.h"
+#include "texture.h"
 
-class material_base {
+class base_material {
  public:
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const = 0;
 };
 
-class material_lambertian : public material_base {
+class lambertian_material : public base_material {
  private:
   std::shared_ptr<texture> albedo_;
 
  public:
-  material_lambertian(color_rgb const& c)
+  lambertian_material(color_rgb const& c)
       : albedo_{std::make_shared<solid_texture>(c)} {}
 
-  material_lambertian(std::shared_ptr<texture> t) : albedo_{t} {}
+  lambertian_material(std::shared_ptr<texture> t) : albedo_{t} {}
 
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
     auto scatter_dir = rec.normal + random_unit_vector();
-
     // test if zero direction
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
     scattered = ray(rec.p, scatter_dir, r_in.time());
     // always scatter, but have an attenuation
-    attenuation = albedo_->value(rec.u, rec.v, rec.p);
+    attenuation = albedo_->value(rec.u, rec.v, rec.p) * random_double(0, 1);
     return true;
   }
 };
 
-class material_metal : public material_base {
+class metal_material : public base_material {
  private:
-  color_rgb albedo_;
+  std::shared_ptr<texture> albedo_;
   double fuzz_;
 
  public:
-  material_metal(const color_rgb& a, double f)
-      : albedo_{a}, fuzz_{f > 1.0 ? 1 : f} {}
+  metal_material(color_rgb const& a, double f)
+      : albedo_{make_shared<solid_texture>(a)}, fuzz_{f > 1.0 ? 1.0 : f} {}
+  metal_material(std::shared_ptr<texture> t, double f)
+      : albedo_{t}, fuzz_{f > 1.0 ? 1.0 : f} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
     scattered =
         ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
-    attenuation = albedo_;
+    attenuation = albedo_->value(rec.u, rec.v, rec.p);
     return (dot(rec.normal, scattered.direction()) > 0.0);
   }
 };
 
-class matetial_dielectric : public material_base {
+class dielectric_material : public base_material {
  private:
   double ir_;
   static double reflectance(double cosine, double ref_idx) {
@@ -63,7 +65,7 @@ class matetial_dielectric : public material_base {
   }
 
  public:
-  matetial_dielectric(double index_of_refraction) : ir_{index_of_refraction} {}
+  dielectric_material(double index_of_refraction) : ir_{index_of_refraction} {}
   vec3d refract(const vec3d& uv, const vec3d& N, double r_ratio) const {
     auto cos_theta = fmin(dot(-uv, N), 1.0);  // for precision
     vec3d ref_x = r_ratio * (uv + cos_theta * N);
@@ -101,5 +103,6 @@ class matetial_dielectric : public material_base {
     return true;
   }
 };
+
 
 #endif

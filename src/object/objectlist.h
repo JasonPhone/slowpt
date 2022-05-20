@@ -4,17 +4,17 @@
 #include <memory>
 #include <vector>
 
-#include "objectbase.h"
+#include "baseobject.h"
 
-class object_list : public object_base {
+class object_list : public base_object{
  public:
-  std::vector<std::shared_ptr<object_base>> objects_;
+  std::vector<std::shared_ptr<base_object>> objects_;
 
  public:
   object_list() {}
-  object_list(std::shared_ptr<object_base> object) { add(object); }
+  object_list(std::shared_ptr<base_object> object) { add(object); }
   void clear() { objects_.clear(); }
-  void add(std::shared_ptr<object_base> obj) { objects_.push_back(obj); }
+  void add(std::shared_ptr<base_object> obj) { objects_.push_back(obj); }
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
   virtual bool bounding_box(double tm0, double tm1,

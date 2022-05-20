@@ -1,29 +1,29 @@
 #ifndef BVH_H
 #define BVH_H
 
-#include "objectbase.h"
+#include "baseobject.h"
 #include "objectlist.h"
 #include "ray.h"
 #include "rtutil.h"
 
-inline bool box_compare(std::shared_ptr<object_base> const a,
-                        std::shared_ptr<object_base> const b, int axis) {
+inline bool box_compare(std::shared_ptr<base_object> const a,
+                        std::shared_ptr<base_object> const b, int axis) {
   aabb boxa, boxb;
   // time 0, 0 just to test the existence of bounding box
   if (!a->bounding_box(0, 0, boxa) || !b->bounding_box(0, 0, boxb))
     std::cerr << "bvh_node::box_compare: No bounding box.\n";
   return boxa.min()[axis] < boxb.min()[axis];
 }
-bool box_compare_x(std::shared_ptr<object_base> const a,
-                   std::shared_ptr<object_base> const b) {
+bool box_compare_x(std::shared_ptr<base_object> const a,
+                   std::shared_ptr<base_object> const b) {
   return box_compare(a, b, 0);
 }
-bool box_compare_y(std::shared_ptr<object_base> const a,
-                   std::shared_ptr<object_base> const b) {
+bool box_compare_y(std::shared_ptr<base_object> const a,
+                   std::shared_ptr<base_object> const b) {
   return box_compare(a, b, 1);
 }
-bool box_compare_z(std::shared_ptr<object_base> a,
-                   std::shared_ptr<object_base> b) {
+bool box_compare_z(std::shared_ptr<base_object> a,
+                   std::shared_ptr<base_object> b) {
   return box_compare(a, b, 2);
 }
 /**
@@ -31,17 +31,17 @@ bool box_compare_z(std::shared_ptr<object_base> a,
  * take a object_list and build the tree
  * over a given time interval
  */
-class bvh_node : public object_base {
+class bvh_node : public base_object {
  public:
   aabb self_box_;
-  std::shared_ptr<object_base> left_, right_;
+  std::shared_ptr<base_object> left_, right_;
 
  public:
   bvh_node() {}
   bvh_node(object_list &obj_list, double time0, double time1)
       : bvh_node{obj_list.objects_, 0, obj_list.objects_.size(), time0, time1} {
   }
-  bvh_node(std::vector<std::shared_ptr<object_base>> &leaf_objects, size_t st,
+  bvh_node(std::vector<std::shared_ptr<base_object>> &leaf_objects, size_t st,
            size_t ed, double time0, double time1);
   virtual bool hit(ray const &r, double t_min, double t_max,
                    hit_record &rec) const override;
@@ -73,8 +73,9 @@ bool bvh_node::bounding_box(double tm0, double tm1, aabb &buf_aabb) const {
  *    one object: dulplicate, no sorting
  *    two objects: split, no sorting
  */
-bvh_node::bvh_node(std::vector<std::shared_ptr<object_base>> &leaf_objects,
+bvh_node::bvh_node(std::vector<std::shared_ptr<base_object>> &leaf_objects,
                    size_t st, size_t ed, double time0, double time1) {
+  if (ed - st <= 0) return;
   int axis = random_int(0, 3);
   auto comparator = (axis == 0)   ? box_compare_x
                     : (axis == 1) ? box_compare_y

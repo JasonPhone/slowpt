@@ -1,25 +1,27 @@
-#ifndef OBJECT_SPHERE_H
-#define OBJECT_SPHERE_H
+#ifndef SPHERE_OBJECT_H
+#define SPHERE_OBJECT_H
 
-#include "objectbase.h"
-#include "rtutil.h"
 #include "aabb.h"
-class object_sphere : public object_base {
+#include "baseobject.h"
+#include "rtutil.h"
+class sphere_object : public base_object {
  private:
   vec3d center0_, center1_;
   double time0_, time1_;
   double radius_;
-  std::shared_ptr<material_base> mat_ptr_;
+  std::shared_ptr<base_material> mat_ptr_;
 
  public:
-  object_sphere() {}
+  sphere_object() {}
+  sphere_object(vec3d const& center, double r, shared_ptr<base_material> m)
+      : sphere_object{center, center, 0, 1, r, m} {}
   /**
    * a (moving) sphere linearly from center0 to center1
    * in time0 and time1
    */
-  object_sphere(const vec3d& cent0, const vec3d& cent1, double tm0, double tm1,
-                double r, std::shared_ptr<material_base> m)
-      : object_base{},
+  sphere_object(const vec3d& cent0, const vec3d& cent1, double tm0, double tm1,
+                double r, std::shared_ptr<base_material> m)
+      : base_object{},
         center0_{cent0},
         center1_{cent1},
         time0_{tm0},
@@ -30,14 +32,15 @@ class object_sphere : public object_base {
                    hit_record& rec) const override;
   virtual bool bounding_box(double tm0, double tm1,
                             aabb& buf_aabb) const override;
-  virtual void get_uv(double const t, point3d const &p, double &u, double &v) const override;
+  virtual void get_uv(double const t, point3d const& p, double& u,
+                      double& v) const override;
   vec3d center(double time) const;
   double radius() const;
 };
 
-bool object_sphere::hit(const ray& r, double t_min, double t_max,
+bool sphere_object::hit(const ray& r, double t_min, double t_max,
                         hit_record& rec) const {
-  vec3d oc = r.origin() - center(r.time()); // ray origin to sphere center
+  vec3d oc = r.origin() - center(r.time());  // ray origin to sphere center
   // solve the intersect equation
   auto a = r.direction().norm2();
   auto half_b = dot(oc, r.direction());
@@ -70,25 +73,22 @@ bool object_sphere::hit(const ray& r, double t_min, double t_max,
 
   return true;
 }
-bool object_sphere::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
-  aabb box0{
-    center(tm0) - vec3d{radius(), radius(), radius()},
-    center(tm0) + vec3d{radius(), radius(), radius()}
-  };
-  aabb box1{
-    center(tm1) - vec3d{radius(), radius(), radius()},
-    center(tm1) + vec3d{radius(), radius(), radius()}
-  };
+bool sphere_object::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
+  aabb box0{center(tm0) - vec3d{radius(), radius(), radius()},
+            center(tm0) + vec3d{radius(), radius(), radius()}};
+  aabb box1{center(tm1) - vec3d{radius(), radius(), radius()},
+            center(tm1) + vec3d{radius(), radius(), radius()}};
   buf_aabb = surrounding_aabb(box0, box1);
   return true;
 }
-vec3d object_sphere::center(double time) const {
+vec3d sphere_object::center(double time) const {
   if (time0_ == time1_) return center0_;
   return center0_ +
          ((time - time0_) / (time1_ - time0_)) * (center1_ - center0_);
 }
-double object_sphere::radius() const { return this->radius_; }
-void object_sphere::get_uv(double const t, point3d const &p, double &u, double &v) const {
+double sphere_object::radius() const { return this->radius_; }
+void sphere_object::get_uv(double const t, point3d const& p, double& u,
+                           double& v) const {
   /**
    * u (longtitude) v (latitude) coordinate is set as:
    *  a point on a unit sphere can be located as (theta, phi)

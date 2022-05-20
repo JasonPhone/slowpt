@@ -6,6 +6,7 @@
  */
 
 #include "colorRGB.h"
+#include "noise.h"
 
 class texture {
  public:
@@ -51,5 +52,17 @@ class checker_texture : public texture {
  public:
   shared_ptr<texture> odd_;
   shared_ptr<texture> even_;
+};
+
+class noise_texture : public texture {
+ public:
+  noise_texture() {}
+
+  virtual color_rgb value(double u, double v, const point3d& p) const override {
+    return color_rgb{1, 1, 1} * noise.noise(p);
+  }
+
+ public:
+  perlin_noise noise;
 };
 #endif

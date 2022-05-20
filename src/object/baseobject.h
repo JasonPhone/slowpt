@@ -1,12 +1,12 @@
-#ifndef OBJECT_BASE_H
-#define OBJECT_BASE_H
+#ifndef BASE_OBJECT_H
+#define BASE_OBJECT_H
 #include "aabb.h"
 #include "ray.h"
 #include "rtutil.h"
-class material_base;
+class base_material;
 struct hit_record {
   double t, u, v;
-  std::shared_ptr<material_base> mat_ptr;
+  std::shared_ptr<base_material> mat_ptr;
   bool front_face;
   point3d p;
   vec3d normal;
@@ -15,7 +15,7 @@ struct hit_record {
     normal = front_face ? outward_normal : -outward_normal;
   }
 };
-class object_base {
+class base_object {
  private:
  public:
   // time may be needed for moving objects
