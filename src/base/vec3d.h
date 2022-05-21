@@ -108,7 +108,7 @@ inline vec3d random_in_unit_disk() {
   }
 }
 inline vec3d random_unit_vector() {
-  return unit_vector((random_in_unit_sphere()));
+  return unit_vector(random_in_unit_sphere());
 }
 vec3d reflect(const vec3d &v, const vec3d &N) { return v - 2 * dot(v, N) * N; }
 

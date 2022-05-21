@@ -7,97 +7,17 @@
 #include "bvh.h"
 #include "camera.h"
 #include "colorRGB.h"
-#include "material.h"
 #include "objectlist.h"
+#include "prefabs.h"
 #include "rtutil.h"
-#include "sphereobject.h"
-#include "texture.h"
 /* encoding issue
 in windows
 .\slowpt.exe | Out-File ../image.ppm -Encoding ascii
 in linux
 ./slowpt > out.ppm
 */
-object_list random_scene() {
-  object_list world;
-  auto checker_txt1 = make_shared<checker_texture>(color_rgb{1.0, 0.75, 0.796},
-                                                   color_rgb{1.0, 0.9, 0.94});
-  auto checker_txt2 = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
-                                                   color_rgb{0.9, 0.9, 0.9});
-  // ground is a huge lembertian sphere
-  world.add(make_shared<sphere_object>(
-      point3d{0, -1000, 0}, 1000,
-      make_shared<lambertian_material>(checker_txt1)));
-  // three big balls
-  auto material1 = make_shared<dielectric_material>(1.5);
-  world.add(make_shared<sphere_object>(point3d{0, 1, 0}, 1.0, material1));
-  auto material2 = make_shared<lambertian_material>(color_rgb(0.4, 0.2, 0.1));
-  world.add(make_shared<sphere_object>(point3d{-4, 1, 0}, 1.0, material2));
-  auto material3 = make_shared<metal_material>(color_rgb{1, 1, 1}, 0.0);
-  world.add(make_shared<sphere_object>(point3d{4, 1, 0}, 1.0, material3));
-  return world;
-  for (int a = -11; a < 11; a++) {
-    for (int b = -11; b < 11; b++) {
-      auto choose_mat = random_double();
-      point3d center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
-      // make sure not overlap big spheres
-      if ((center - point3d(4, 0.2, 0)).norm() > 0.9) {
-        shared_ptr<base_material> sphere_material;
-        if (choose_mat < 0.3) {
-          // diffuse
-          auto albedo = color_rgb::random() * color_rgb::random();
-          sphere_material = make_shared<lambertian_material>(albedo);
-          auto center2 = center + vec3d{0, random_double(0, 0.5), 0};
-          world.add(make_shared<sphere_object>(center, center2, 0.0, 1.0, 0.2,
-                                               sphere_material));
-        } else if (choose_mat < 0.6) {
-          // metal
-          auto albedo = color_rgb::random(0.5, 1);
-          auto fuzz = random_double(0, 0.5);
-          sphere_material = make_shared<metal_material>(albedo, fuzz);
-          auto center2 = center + vec3d{0, random_double(0, 0.5), 0};
-          world.add(make_shared<sphere_object>(center, center2, 0.0, 1.0, 0.2,
-                                               sphere_material));
-        } else {
-          // glass
-          sphere_material = make_shared<dielectric_material>(1.5);
-          auto center2 = center + vec3d{0, random_double(0, 0.5), 0};
-          world.add(make_shared<sphere_object>(center, center2, 0.0, 1.0, 0.2,
-                                               sphere_material));
-        }
-      }
-    }
-  }
-  return world;
-}
-object_list two_spheres() {
-  object_list objects;
-  auto checker = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
-                                              color_rgb{0.9, 0.9, 0.9});
-  objects.add(make_shared<sphere_object>(
-      point3d{0, -10, 0}, 10, make_shared<lambertian_material>(checker)));
-  objects.add(make_shared<sphere_object>(
-      point3d{0, 10, 0}, 10, make_shared<lambertian_material>(checker)));
-  return objects;
-}
-object_list two_perlin_spheres() {
-  object_list objects;
 
-  auto pertext = make_shared<noise_texture>();
-  objects.add(make_shared<sphere_object>(
-      point3d{0, -1000, 0}, 1000, make_shared<lambertian_material>(pertext)));
-  objects.add(make_shared<sphere_object>(
-      point3d(0, 2, 0), 2, make_shared<lambertian_material>(pertext)));
-
-  return objects;
-}
-object_list one_sphere() {
-  object_list objects;
-  auto mat = make_shared<lambertian_material>(color_rgb{1, 1, 1});
-  objects.add(make_shared<sphere_object>(point3d{0, 0, 0}, 1, mat));
-  return objects;
-}
-color_rgb ray_color(ray const& r, base_object const& world, int bounce_depth) {
+color_rgb ray_color(ray const &r, base_object const &world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
   if (bounce_depth <= 0) return color_rgb{0, 0, 0};
@@ -111,7 +31,7 @@ color_rgb ray_color(ray const& r, base_object const& world, int bounce_depth) {
       return color_rgb{0, 0, 0};
   }
   /******** Background ********/
-  // return color_rgb{1, 1, 1};  // pure white background
+  return color_rgb{1, 1, 1};  // pure white background
   /** background, blue-white gradient
    * NOTE: this sky simulation will affect
    * tone of the whole image in recursion
@@ -129,7 +49,7 @@ int main() {
   const int image_w = 400;
   const int image_h = static_cast<int>(image_w / aspect_ratio);
   const int spp = 500;
-  const int max_bounce = 20;
+  const int max_bounce = 10;
 
   /******** Objects wolrd ********/
   // object_list world;
@@ -142,7 +62,7 @@ int main() {
   auto aperture = 0.0;
   auto apt_open = 0.0, apt_close = 1.0;
   auto vfov = 40.0;
-  switch (2) {
+  switch (3) {
     case 1:
       world = random_scene();
       lookfrom = point3d(13, 2, 3);
@@ -170,7 +90,6 @@ int main() {
   }
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
              aperture, dist_to_focus, apt_open, apt_close};
-
   /******** Render ********/
   bvh_node world_bvh{world, apt_open, apt_close};
   std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";

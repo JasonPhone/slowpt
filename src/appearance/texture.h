@@ -57,12 +57,15 @@ class checker_texture : public texture {
 class noise_texture : public texture {
  public:
   noise_texture() {}
+  noise_texture(double scale) : scale_{scale} {}
 
   virtual color_rgb value(double u, double v, const point3d& p) const override {
-    return color_rgb{1, 1, 1} * noise.noise(p);
+    return color_rgb{1, 1, 1} * 0.5 *
+           (1 + sin(p.z() * scale_ + 10 * noise_.turb(p)));
   }
 
- public:
-  perlin_noise noise;
+ private:
+  perlin_noise noise_;
+  double scale_;  // the noise is periodic
 };
 #endif
