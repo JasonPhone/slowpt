@@ -113,9 +113,11 @@ object_list cornell_box() {
   objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white));
   objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
 
-  auto checker = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
-                                              color_rgb{0.9, 0.9, 0.9});
-
+  auto checker_txt1 = make_shared<checker_texture>(color_rgb{1.0, 0.75, 0.796},
+                                                   color_rgb{0.9, 0.9, 0.9});
+  objects.add(make_shared<sphere_object>(point3d{400, 150, 300}, 100, make_shared<lambertian_material>(checker_txt1)));
+  auto dielect_mat = make_shared<dielectric_material>(1.5);
+  objects.add(make_shared<sphere_object>(point3d{150, 350, 150}, 80, dielect_mat));
   return objects;
 }
 #endif

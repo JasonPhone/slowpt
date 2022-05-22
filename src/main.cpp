@@ -1,3 +1,9 @@
+/* encoding issue
+in windows
+.\slowpt.exe | Out-File ../image.ppm -Encoding ascii
+in linux
+./slowpt > out.ppm
+*/
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -10,12 +16,6 @@
 #include "objectlist.h"
 #include "prefabs.h"
 #include "rtutil.h"
-/* encoding issue
-in windows
-.\slowpt.exe | Out-File ../image.ppm -Encoding ascii
-in linux
-./slowpt > out.ppm
-*/
 /**
  * cast a ray to the world and get its color
  */
@@ -44,7 +44,7 @@ int main() {
   double aspect_ratio = 16.0 / 9.0;
   int image_w = 400;
   int spp = 500;
-  int max_bounce = 2;
+  int max_bounce = 30;
   color_rgb background_color{0, 0, 0};
 
   /******** Objects wolrd ********/
@@ -96,7 +96,7 @@ int main() {
       world = cornell_box();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp = 200;
+      spp = 1000;
       background_color = color_rgb(0, 0, 0);
       lookfrom = point3d(278, 278, -800);
       lookat = point3d(278, 278, 0);
