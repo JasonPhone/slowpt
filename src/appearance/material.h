@@ -1,8 +1,8 @@
 #ifndef MATERIAL_BASE_H
 #define MATERIAL_BASE_H
 
-#include "noise.h"
 #include "baseobject.h"
+#include "noise.h"
 #include "rtutil.h"
 #include "texture.h"
 
@@ -10,6 +10,9 @@ class base_material {
  public:
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const = 0;
+  virtual color_rgb emit(double u, double v, point3d const& p) const {
+    return color_rgb{0, 0, 0};  // we do not emit light by default
+  }
 };
 
 class lambertian_material : public base_material {
@@ -103,6 +106,21 @@ class dielectric_material : public base_material {
     return true;
   }
 };
+class diffuse_light : public base_material {
+ public:
+  // cstr takes a color (to solid texture) or a texture (any would be ok)
+  diffuse_light(shared_ptr<texture> txt) : emit_{txt} {}
+  diffuse_light(color_rgb const& c) : emit_{make_shared<solid_texture>(c)} {}
+  virtual bool scatter(const ray& r_in, const hit_record& rec,
+                       color_rgb& attenuation, ray& scattered) const override {
+    return false;  // a diffuse light source does not reflect rays
+  }
+  virtual color_rgb emit(double u, double v, point3d const& p) const override {
+    return emit_->value(u, v, p);
+  }
 
+ private:
+  shared_ptr<texture> emit_;  // always use a texture now
+};
 
 #endif

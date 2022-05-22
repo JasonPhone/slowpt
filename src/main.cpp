@@ -16,40 +16,36 @@ in windows
 in linux
 ./slowpt > out.ppm
 */
-
-color_rgb ray_color(ray const &r, base_object const &world, int bounce_depth) {
+/**
+ * cast a ray to the world and get its color
+ */
+color_rgb ray_color(ray const &r, color_rgb const &background,
+                    base_object const &world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
+  // if ray reaches max bounce it gets nothing
   if (bounce_depth <= 0) return color_rgb{0, 0, 0};
+  // if ray does not hit anything it gets backround color
+  if (!world.hit(r, 0.001, INF_DBL, rec)) return background;
   // shading are handled by object_list
-  if (world.hit(r, 0.001, INF_DBL, rec)) {
-    ray scattered;
-    color_rgb attenuation;
-    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-      return attenuation * ray_color(scattered, world, bounce_depth - 1);
-    else
-      return color_rgb{0, 0, 0};
-  }
-  /******** Background ********/
-  return color_rgb{1, 1, 1};  // pure white background
-  /** background, blue-white gradient
-   * NOTE: this sky simulation will affect
-   * tone of the whole image in recursion
-   */
-  vec3d unit_dir = unit_vector(r.direction());
-  // cast [-1, 1] to [0, 1]
-  auto t = 0.5 * (unit_dir.y() + 1.0);
-  // linear interpolation of magic blue number
-  return (1.0 - t) * color_rgb{1.0, 1.0, 1.0} + t * color_rgb{0.7, 0.7, 1.0};
+  ray scattered;
+  color_rgb attenuation;
+  color_rgb emit_color = rec.mat_ptr->emit(rec.u, rec.v, rec.p);
+  // if the material scatters light this ray gets scatter and emit
+  if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+    return emit_color + attenuation * ray_color(scattered, background, world,
+                                                bounce_depth - 1);
+  else
+    return emit_color;
 }
 int main() {
   std::srand(std::time(nullptr));
   /******** Image config ********/
-  const double aspect_ratio = 16.0 / 9.0;
-  const int image_w = 400;
-  const int image_h = static_cast<int>(image_w / aspect_ratio);
-  const int spp = 500;
-  const int max_bounce = 10;
+  double aspect_ratio = 16.0 / 9.0;
+  int image_w = 400;
+  int spp = 500;
+  int max_bounce = 2;
+  color_rgb background_color{0, 0, 0};
 
   /******** Objects wolrd ********/
   // object_list world;
@@ -62,13 +58,14 @@ int main() {
   auto aperture = 0.0;
   auto apt_open = 0.0, apt_close = 1.0;
   auto vfov = 40.0;
-  switch (3) {
+  switch (6) {
     case 1:
       world = random_scene();
       lookfrom = point3d(13, 2, 3);
       lookat = point3d(0, 0, 0);
       vfov = 20.0;
       aperture = 0.1;
+      background_color = color_rgb{0.7, 0.8, 1.0};
       break;
 
     case 2:
@@ -76,6 +73,8 @@ int main() {
       lookfrom = point3d(13, 2, 3);
       lookat = point3d(0, 0, 0);
       vfov = 20.0;
+      background_color = color_rgb{0.7, 0.8, 1.0};
+      break;
       break;
 
     case 3:
@@ -83,11 +82,31 @@ int main() {
       lookfrom = point3d(13, 2, 3);
       lookat = point3d(0, 0, 0);
       vfov = 20.0;
+      background_color = color_rgb{0.7, 0.8, 1.0};
       break;
-
+      break;
+    case 5:
+      world = simple_light();
+      background_color = color_rgb{0, 0, 0};
+      lookfrom = point3d(26, 3, 6);
+      lookat = point3d(0, 2, 0);
+      vfov = 20.0;
+      break;
+    case 6:
+      world = cornell_box();
+      aspect_ratio = 1.0;
+      image_w = 600;
+      spp = 200;
+      background_color = color_rgb(0, 0, 0);
+      lookfrom = point3d(278, 278, -800);
+      lookat = point3d(278, 278, 0);
+      vfov = 40.0;
+      break;
     default:
       world = one_sphere();
+      background_color = color_rgb{0, 0, 0};
   }
+  int image_h = static_cast<int>(image_w / aspect_ratio);
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
              aperture, dist_to_focus, apt_open, apt_close};
   /******** Render ********/
@@ -102,7 +121,7 @@ int main() {
         auto u = (j + random_double()) / (image_w - 1);
         auto v = (i + random_double()) / (image_h - 1);
         ray r = cam.ray_at(u, v);
-        pixel_color += ray_color(r, world_bvh, max_bounce);
+        pixel_color += ray_color(r, background_color, world_bvh, max_bounce);
       }
       write_color(std::cout, pixel_color, spp);
     }

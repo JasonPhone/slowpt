@@ -1,5 +1,6 @@
 #ifndef PREFABS_H
 #define PREFABS_H
+#include "aarectangle.h"
 #include "baseobject.h"
 #include "material.h"
 #include "sphereobject.h"
@@ -81,6 +82,40 @@ object_list one_sphere() {
   object_list objects;
   auto mat = make_shared<lambertian_material>(color_rgb{1, 1, 1});
   objects.add(make_shared<sphere_object>(point3d{0, 0, 0}, 1, mat));
+  return objects;
+}
+object_list simple_light() {
+  object_list objects;
+
+  auto pertext = make_shared<noise_texture>(4);
+  objects.add(make_shared<sphere_object>(
+      point3d(0, -1000, 0), 1000, make_shared<lambertian_material>(pertext)));
+  objects.add(make_shared<sphere_object>(
+      point3d(0, 2, 0), 2, make_shared<lambertian_material>(pertext)));
+
+  auto difflight = make_shared<diffuse_light>(color_rgb(4, 4, 4));
+  objects.add(make_shared<xy_rectangle>(3, 5, 1, 3, -2, difflight));
+
+  return objects;
+}
+object_list cornell_box() {
+  object_list objects;
+
+  auto red = make_shared<lambertian_material>(color_rgb(.65, .05, .05));
+  auto white = make_shared<lambertian_material>(color_rgb(.73, .73, .73));
+  auto green = make_shared<lambertian_material>(color_rgb(.12, .45, .15));
+  auto light = make_shared<diffuse_light>(color_rgb(15, 15, 15));
+
+  objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 555, green));
+  objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 0, red));
+  objects.add(make_shared<xz_rectangle>(213, 343, 227, 332, 554, light));
+  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 0, white));
+  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white));
+  objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
+
+  auto checker = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
+                                              color_rgb{0.9, 0.9, 0.9});
+
   return objects;
 }
 #endif

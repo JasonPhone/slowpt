@@ -8,7 +8,7 @@
 class aabb {
  private:
   // two points to represent the aabb,
-  // min_ for corner near to origin, max_ for the other
+  // min_ for corner near to -infty, max_ for the other
   point3d min_, max_;
 
  public:
