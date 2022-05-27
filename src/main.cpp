@@ -43,8 +43,8 @@ int main() {
   /******** Image config ********/
   double aspect_ratio = 16.0 / 9.0;
   int image_w = 400;
-  int spp = 500;
-  int max_bounce = 30;
+  int spp = 100;
+  int max_bounce = 20;
   color_rgb background_color{0, 0, 0};
 
   /******** Objects wolrd ********/
@@ -96,7 +96,8 @@ int main() {
       world = cornell_box();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp = 1000;
+      spp = 500;
+      max_bounce = 30;
       background_color = color_rgb(0, 0, 0);
       lookfrom = point3d(278, 278, -800);
       lookat = point3d(278, 278, 0);

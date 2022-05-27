@@ -41,5 +41,5 @@
         "latex",
         "plaintext"
     ],
-    "cmake.sourceDirectory": "${workspaceFolder}/src",
+    "cmake.sourceDirectory": "${workspaceFolder}/",
 }

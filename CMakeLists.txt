@@ -7,13 +7,13 @@ project(slowpt
 )
 
 include_directories(
-  base
-  object
-  appearance
+  src/base
+  src/object
+  src/appearance
 )
 
 set(MAIN_SRC
-  main.cpp
+  src/main.cpp
 )
 
 add_executable(slowpt

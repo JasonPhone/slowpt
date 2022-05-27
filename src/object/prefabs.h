@@ -2,8 +2,9 @@
 #define PREFABS_H
 #include "aarectangle.h"
 #include "baseobject.h"
+#include "box.h"
 #include "material.h"
-#include "sphereobject.h"
+#include "sphere.h"
 #include "texture.h"
 
 object_list random_scene() {
@@ -112,12 +113,25 @@ object_list cornell_box() {
   objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 0, white));
   objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white));
   objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
+  shared_ptr<base_object> box1 =
+      make_shared<box>(point3d(0, 0, 0), point3d(165, 330, 165), white);
+  box1 = make_shared<rotate_y>(box1, 15);
+  box1 = make_shared<translate>(box1, vec3d(265, 0, 295));
+  objects.add(box1);
 
-  auto checker_txt1 = make_shared<checker_texture>(color_rgb{1.0, 0.75, 0.796},
-                                                   color_rgb{0.9, 0.9, 0.9});
-  objects.add(make_shared<sphere_object>(point3d{400, 150, 300}, 100, make_shared<lambertian_material>(checker_txt1)));
-  auto dielect_mat = make_shared<dielectric_material>(1.5);
-  objects.add(make_shared<sphere_object>(point3d{150, 350, 150}, 80, dielect_mat));
+  shared_ptr<base_object> box2 =
+      make_shared<box>(point3d(0, 0, 0), point3d(165, 165, 165), white);
+  box2 = make_shared<rotate_y>(box2, -18);
+  box2 = make_shared<translate>(box2, vec3d(130, 0, 65));
+  objects.add(box2);
+  // auto checker_txt1 = make_shared<checker_texture>(color_rgb{1.0, 0.75,
+  // 0.796},
+  //                                                  color_rgb{0.9, 0.9, 0.9});
+  // objects.add(make_shared<sphere_object>(point3d{400, 150, 300}, 100,
+  // make_shared<lambertian_material>(checker_txt1))); auto dielect_mat =
+  // make_shared<dielectric_material>(1.5);
+  // objects.add(make_shared<sphere_object>(point3d{150, 350, 150}, 80,
+  // dielect_mat));
   return objects;
 }
 #endif
