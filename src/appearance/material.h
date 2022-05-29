@@ -123,4 +123,22 @@ class diffuse_light : public base_material {
   shared_ptr<texture> emit_;  // always use a texture now
 };
 
+class isotropic_medium : public base_material {
+ private:
+  shared_ptr<texture> albedo_;
+
+ public:
+  isotropic_medium(color_rgb clr) : albedo_{make_shared<solid_texture>(clr)} {}
+  isotropic_medium(shared_ptr<texture> text) : albedo_{text} {}
+  virtual bool scatter(const ray& r_in, const hit_record& rec,
+                       color_rgb& attenuation, ray& scattered) const override {
+    // in all random direction
+    scattered = ray{rec.p, random_in_unit_sphere(), r_in.time()};
+    // just the albedo
+    attenuation = albedo_->value(rec.u, rec.v, rec.p);
+    return true;
+  }
+  // This fog does not emit light
+};
+
 #endif

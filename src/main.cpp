@@ -58,7 +58,7 @@ int main() {
   auto aperture = 0.0;
   auto apt_open = 0.0, apt_close = 1.0;
   auto vfov = 40.0;
-  switch (6) {
+  switch (8) {
     case 1:
       world = random_scene();
       lookfrom = point3d(13, 2, 3);
@@ -67,7 +67,6 @@ int main() {
       aperture = 0.1;
       background_color = color_rgb{0.7, 0.8, 1.0};
       break;
-
     case 2:
       world = two_spheres();
       lookfrom = point3d(13, 2, 3);
@@ -75,8 +74,6 @@ int main() {
       vfov = 20.0;
       background_color = color_rgb{0.7, 0.8, 1.0};
       break;
-      break;
-
     case 3:
       world = two_perlin_spheres();
       lookfrom = point3d(13, 2, 3);
@@ -96,10 +93,30 @@ int main() {
       world = cornell_box();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp = 500;
+      spp = 100;
       max_bounce = 30;
       background_color = color_rgb(0, 0, 0);
       lookfrom = point3d(278, 278, -800);
+      lookat = point3d(278, 278, 0);
+      vfov = 40.0;
+      break;
+    case 7:
+      world = cornell_smoke();
+      aspect_ratio = 1.0;
+      image_w = 600;
+      spp = 200;
+      lookfrom = point3d(278, 278, -800);
+      lookat = point3d(278, 278, 0);
+      vfov = 40.0;
+      break;
+    case 8:
+      world = final_scene();
+      aspect_ratio = 1.0;
+      image_w = 600;
+      spp = 10000;
+      max_bounce = 50;
+      background_color = color_rgb(0, 0, 0);
+      lookfrom = point3d(478, 278, -600);
       lookat = point3d(278, 278, 0);
       vfov = 40.0;
       break;

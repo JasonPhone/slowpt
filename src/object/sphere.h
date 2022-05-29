@@ -4,7 +4,7 @@
 #include "aabb.h"
 #include "baseobject.h"
 #include "rtutil.h"
-class sphere_object : public base_object {
+class sphere : public base_object {
  private:
   vec3d center0_, center1_;
   double time0_, time1_;
@@ -12,14 +12,14 @@ class sphere_object : public base_object {
   std::shared_ptr<base_material> mat_ptr_;
 
  public:
-  sphere_object() {}
-  sphere_object(vec3d const& center, double r, shared_ptr<base_material> m)
-      : sphere_object{center, center, 0, 1, r, m} {}
+  sphere() {}
+  sphere(vec3d const& center, double r, shared_ptr<base_material> m)
+      : sphere{center, center, 0, 1, r, m} {}
   /**
    * a (moving) sphere linearly from center0 to center1
    * in time0 and time1
    */
-  sphere_object(const vec3d& cent0, const vec3d& cent1, double tm0, double tm1,
+  sphere(const vec3d& cent0, const vec3d& cent1, double tm0, double tm1,
                 double r, std::shared_ptr<base_material> m)
       : base_object{},
         center0_{cent0},
@@ -38,7 +38,7 @@ class sphere_object : public base_object {
   double radius() const;
 };
 
-bool sphere_object::hit(const ray& r, double t_min, double t_max,
+bool sphere::hit(const ray& r, double t_min, double t_max,
                         hit_record& rec) const {
   vec3d oc = r.origin() - center(r.time());  // ray origin to sphere center
   // solve the intersect equation
@@ -73,7 +73,7 @@ bool sphere_object::hit(const ray& r, double t_min, double t_max,
 
   return true;
 }
-bool sphere_object::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
+bool sphere::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
   aabb box0{center(tm0) - vec3d{radius(), radius(), radius()},
             center(tm0) + vec3d{radius(), radius(), radius()}};
   aabb box1{center(tm1) - vec3d{radius(), radius(), radius()},
@@ -81,13 +81,13 @@ bool sphere_object::bounding_box(double tm0, double tm1, aabb& buf_aabb) const {
   buf_aabb = surrounding_aabb(box0, box1);
   return true;
 }
-vec3d sphere_object::center(double time) const {
+vec3d sphere::center(double time) const {
   if (time0_ == time1_) return center0_;
   return center0_ +
          ((time - time0_) / (time1_ - time0_)) * (center1_ - center0_);
 }
-double sphere_object::radius() const { return this->radius_; }
-void sphere_object::get_uv(double const t, point3d const& p, double& u,
+double sphere::radius() const { return this->radius_; }
+void sphere::get_uv(double const t, point3d const& p, double& u,
                            double& v) const {
   /**
    * u (longtitude) v (latitude) coordinate is set as:

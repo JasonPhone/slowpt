@@ -25,7 +25,9 @@ class base_object {
  public:
   // time may be needed for moving objects
   virtual void get_uv(double const t, point3d const& p, double& u,
-                      double& v) const = 0;
+                      double& v) const {
+    // By default we do uv in hit()
+  }
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const = 0;
   virtual bool bounding_box(double tm0, double tm1, aabb& buf_aabb) const = 0;
@@ -76,10 +78,7 @@ class rotate_y : public base_object {
 
  public:
   rotate_y(shared_ptr<base_object> obj, double angle);
-  virtual void get_uv(double const t, point3d const& p, double& u,
-                      double& v) const override {
-    // get uv in hit()
-  }
+  // get uv in hit()
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const override;
   virtual bool bounding_box(double tm0, double tm1,
@@ -132,7 +131,7 @@ bool rotate_y::hit(const ray& r, double t_min, double t_max,
   dir[0] = cos_theta_ * r.direction()[0] - sin_theta_ * r.direction()[2];
   dir[2] = sin_theta_ * r.direction()[0] + cos_theta_ * r.direction()[2];
   ray rot_r{origin, dir, r.time()};
-  // then do the regular hit
+  // then do the regular hit, the uv is also done
   if (!obj_ptr_->hit(rot_r, t_min, t_max, rec)) return false;
   // rotate BACK the record, note the sign
   auto p = rec.p;
