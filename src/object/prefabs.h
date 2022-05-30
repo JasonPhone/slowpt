@@ -178,7 +178,7 @@ object_list final_scene() {
       auto z0 = -1000.0 + j * w;
       auto y0 = 0.0;
       auto x1 = x0 + w;
-      auto y1 = random_double(1, 101);
+      auto y1 = random_double(1, 70);
       auto z1 = z0 + w;
       boxes1.add(
           make_shared<box>(point3d(x0, y0, z0), point3d(x1, y1, z1), ground));
@@ -208,7 +208,7 @@ object_list final_scene() {
   objects.add(boundary);
   objects.add(
       make_shared<constant_medium>(boundary, 0.02, color_rgb(0.2, 0.4, 0.9)));
-  // a huge sphere with thin it, as the whole atmosphere
+  // a huge sphere with thin smoke, as the whole atmosphere
   boundary = make_shared<sphere>(point3d(0, 0, 0), 5000,
                                  make_shared<dielectric_material>(1.5));
   objects.add(
