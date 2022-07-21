@@ -3,7 +3,7 @@
 
 #include "baseobject.h"
 #include "noise.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 #include "texture.h"
 
 class base_material {

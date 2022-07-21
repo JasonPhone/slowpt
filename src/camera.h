@@ -2,7 +2,7 @@
 #define CAMERA_H
 
 #include "ray.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 
 class camera {
  private:

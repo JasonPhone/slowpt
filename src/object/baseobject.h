@@ -2,7 +2,7 @@
 #define BASE_OBJECT_H
 #include "aabb.h"
 #include "ray.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 class base_material;
 struct hit_record {
   double t;                                // time ray hit an object

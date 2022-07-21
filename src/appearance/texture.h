@@ -7,6 +7,7 @@
 
 #include "colorRGB.h"
 #include "noise.h"
+#include "image_utils.h"
 
 class texture {
  public:
@@ -68,4 +69,19 @@ class noise_texture : public texture {
   perlin_noise noise_;
   double scale_;  // the noise is periodic
 };
+
+class image_texture : public texture {
+ private:
+  color_rgb color_value_;
+
+ public:
+  image_texture() {}
+  image_texture(color_rgb const& c) : color_value_{c} {}
+  image_texture(double r, double g, double b)
+      : image_texture{color_rgb{r, g, b}} {}
+  virtual color_rgb value(double u, double v, point3d const& p) const override {
+    return color_value_;
+  }
+};
+
 #endif

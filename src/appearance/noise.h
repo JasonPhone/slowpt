@@ -1,7 +1,7 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-#include "rtutil.h"
+#include "rt_utils.h"
 /**
  *  We set value of the noise function as zero,
  *  and assign a random gradient at each lattice.

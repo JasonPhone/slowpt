@@ -2,7 +2,7 @@
 #define CONSTANTMEDIUM_H
 
 #include "baseobject.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 #include "texture.h"
 #include "material.h"
 

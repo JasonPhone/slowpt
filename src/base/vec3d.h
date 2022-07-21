@@ -5,7 +5,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "rtutil.h"
+#include "rt_utils.h"
 
 class vec3d {
  public:

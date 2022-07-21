@@ -15,7 +15,7 @@ in linux
 #include "colorRGB.h"
 #include "objectlist.h"
 #include "prefabs.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 /**
  * cast a ray to the world and get its color
  */

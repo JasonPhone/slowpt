@@ -10,6 +10,7 @@ include_directories(
   src/base
   src/object
   src/appearance
+  src/thirdparty
 )
 
 set(MAIN_SRC

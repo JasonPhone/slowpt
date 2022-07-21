@@ -3,7 +3,7 @@
 
 #include "aabb.h"
 #include "baseobject.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 class sphere : public base_object {
  private:
   vec3d center0_, center1_;
@@ -65,6 +65,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max,
   rec.t = root;
   rec.p = r.at(root);
   // NOTE: only correct for sphere
+  // this is normalized
   vec3d outward_normal = (rec.p - center(r.time())) / radius_;
   rec.set_face_normal(r, outward_normal);
   rec.mat_ptr = mat_ptr_;
@@ -91,14 +92,15 @@ void sphere::get_uv(double const t, point3d const& p, double& u,
                            double& v) const {
   /**
    * u (longtitude) v (latitude) coordinate is set as:
-   *  a point on a unit sphere can be located as (theta, phi)
+   *  a point on a unit sphere(center at origin)
+   *  can be located as (theta, phi)
    *  where theta is angle from -Y axis up to Y axis,
    *  phi is angle from -X axis, to +Z, +X, -Z, then back to -X.
    *  and u, v are normalized theta, phi:
    *    v = theta / pi, u = phi / 2pi
    *  convert from xyz coordinate:
    *    theta = acos(-y), phi = atan2(-z, x) + pi
-   * NOTE: this procedure uses surface normal to calculate uv, so
+   * NOTE: p is outward normal
    */
   auto theta = acos(-p.y());
   auto phi = atan2(-p.z(), p.x()) + PI;

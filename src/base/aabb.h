@@ -2,7 +2,7 @@
 #define AABB_H
 
 #include "ray.h"
-#include "rtutil.h"
+#include "rt_utils.h"
 #include "vec3d.h"
 
 class aabb {
