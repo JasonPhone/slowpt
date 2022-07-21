@@ -82,7 +82,7 @@ object_list two_perlin_spheres() {
 }
 object_list one_sphere() {
   object_list objects;
-  auto mat = make_shared<lambertian_material>(color_rgb{1, 1, 1});
+  auto mat = make_shared<lambertian_material>(color_rgb{0, 1, 1});
   objects.add(make_shared<sphere>(point3d{0, 0, 0}, 1, mat));
   return objects;
 }
@@ -165,6 +165,15 @@ object_list cornell_smoke() {
 
   return objects;
 }
+object_list earth() {
+  object_list objects;
+  auto earth_texture = make_shared<image_texture>("./src/appearance/earthmap.jpg");
+  auto earth_surface = make_shared<lambertian_material>(earth_texture);
+  // auto default_mat = make_shared<lambertian_material>(color_rgb{0.7, 0.8, 0.9});
+  auto globe = make_shared<sphere>(point3d{0, 0, 0}, 2, earth_surface);
+  objects.add(globe);
+  return objects;
+}
 object_list final_scene() {
   object_list objects;
   // ground
@@ -213,10 +222,11 @@ object_list final_scene() {
                                  make_shared<dielectric_material>(1.5));
   objects.add(
       make_shared<constant_medium>(boundary, .0001, color_rgb(1, 1, 1)));
-  // image texture is not implemented yet (2022.05.29)
-  // auto emat =
-  //     make_shared<lambertian>(make_shared<image_texture>("earthmap.jpg"));
-  // objects.add(make_shared<sphere>(point3d(400, 200, 400), 100, emat));
+  // image texture, the earth
+  auto earth_texture = make_shared<image_texture>("./src/appearance/earthmap.jpg");
+  auto earth_surface = make_shared<lambertian_material>(earth_texture);
+  auto globe = make_shared<sphere>(point3d{0, 0, 0}, 2, earth_surface);
+  objects.add(globe);
   // a noise sphere
   auto pertext = make_shared<noise_texture>(0.1);
   objects.add(make_shared<sphere>(point3d(220, 280, 300), 80,

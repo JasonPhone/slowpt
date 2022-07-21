@@ -1,8 +1,8 @@
 /* encoding issue
 in windows
-.\slowpt.exe | Out-File ../image.ppm -Encoding ascii
+.\build\slowpt.exe | Out-File ./image.ppm -Encoding ascii
 in linux
-./slowpt > out.ppm
+./build/slowpt > out.ppm
 */
 #include <ctime>
 #include <iomanip>
@@ -38,7 +38,11 @@ color_rgb ray_color(ray const &r, color_rgb const &background,
   else
     return emit_color;
 }
-int main() {
+int main(int argc, char *argv[]) {
+  int scene_idx = 0;
+  if (argc > 1) {
+    scene_idx = atoi(argv[1]);
+  }
   std::srand(std::time(nullptr));
   /******** Image config ********/
   double aspect_ratio = 16.0 / 9.0;
@@ -58,7 +62,7 @@ int main() {
   auto aperture = 0.0;
   auto apt_open = 0.0, apt_close = 1.0;
   auto vfov = 40.0;
-  switch (6) {
+  switch (scene_idx) {
     case 1:
       world = random_scene();
       lookfrom = point3d(13, 2, 3);
@@ -120,9 +124,18 @@ int main() {
       lookat = point3d(278, 278, 0);
       vfov = 40.0;
       break;
+    case 9:
+      world = earth();
+      lookfrom = point3d{13, 2, 3};
+      lookat = point3d{0, 0, 0};
+      vfov = 20.0;
+      break;
     default:
       world = one_sphere();
-      background_color = color_rgb{0, 0, 0};
+      lookfrom = point3d{13, 2, 3};
+      lookat = point3d{0, 0, 0};
+      vfov = 20.0;
+      background_color = color_rgb{0.7, 0.7, 0.7};
   }
   int image_h = static_cast<int>(image_w / aspect_ratio);
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
@@ -134,13 +147,13 @@ int main() {
     std::cerr << "\rScanlines remaining: " << std::setw(3) << i << "/"
               << image_h << std::flush;
     for (int j = 0; j < image_w; j++) {
-      color_rgb pixel_color{0, 0, 0}; // sample a pixel
+      color_rgb pixel_color{0, 0, 0};  // sample a pixel
       for (int si = 0; si < spp_sqrt; si++) {
         for (int sj = 0; sj < spp_sqrt; sj++) {
           // stratified sampling
-          // auto u = (j + (1.0 * sj + random_double()) / spp_sqrt) / (image_w - 1);
-          // auto v = (i + (1.0 * si + random_double()) / spp_sqrt) / (image_h - 1);
-          // normal random sampling
+          // auto u = (j + (1.0 * sj + random_double()) / spp_sqrt) / (image_w -
+          // 1); auto v = (i + (1.0 * si + random_double()) / spp_sqrt) /
+          // (image_h - 1); normal random sampling
           auto u = (j + random_double()) / (image_w - 1);
           auto v = (i + random_double()) / (image_h - 1);
           ray r = cam.ray_at(u, v);
