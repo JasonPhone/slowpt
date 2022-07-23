@@ -81,6 +81,7 @@ object_list two_perlin_spheres() {
   return objects;
 }
 object_list one_sphere() {
+  // NOTE no lights
   object_list objects;
   auto mat = make_shared<lambertian_material>(color_rgb{0, 1, 1});
   objects.add(make_shared<sphere>(point3d{0, 0, 0}, 1, mat));
@@ -141,7 +142,7 @@ object_list cornell_smoke() {
   auto red = make_shared<lambertian_material>(color_rgb(.65, .05, .05));
   auto white = make_shared<lambertian_material>(color_rgb(.73, .73, .73));
   auto green = make_shared<lambertian_material>(color_rgb(.12, .45, .15));
-  auto light = make_shared<diffuse_light>(color_rgb(7, 7, 7));
+  auto light = make_shared<diffuse_light>(color_rgb(.7, .7, .7));
 
   objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 555, green));
   objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 0, red));
@@ -172,6 +173,12 @@ object_list earth() {
   // auto default_mat = make_shared<lambertian_material>(color_rgb{0.7, 0.8, 0.9});
   auto globe = make_shared<sphere>(point3d{0, 0, 0}, 2, earth_surface);
   objects.add(globe);
+  // a light
+  auto light_clr = make_shared<diffuse_light>(color_rgb{9, 9, 9});
+  auto light1 = make_shared<xz_rectangle>(-2, 2, -2, 2, 5, light_clr);
+  objects.add(light1);
+  auto light2 = make_shared<xy_rectangle>(-2, 2, -2, 2, 5, light_clr);
+  objects.add(light2);
   return objects;
 }
 object_list final_scene() {
@@ -225,7 +232,7 @@ object_list final_scene() {
   // image texture, the earth
   auto earth_texture = make_shared<image_texture>("./src/appearance/earthmap.jpg");
   auto earth_surface = make_shared<lambertian_material>(earth_texture);
-  auto globe = make_shared<sphere>(point3d{0, 0, 0}, 2, earth_surface);
+  auto globe = make_shared<sphere>(point3d{400, 200, 400}, 100, earth_surface);
   objects.add(globe);
   // a noise sphere
   auto pertext = make_shared<noise_texture>(0.1);

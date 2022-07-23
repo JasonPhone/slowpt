@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
       world = final_scene();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp_sqrt = 100;
+      spp_sqrt = 10;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
       lookfrom = point3d(478, 278, -600);
@@ -128,14 +128,15 @@ int main(int argc, char *argv[]) {
       world = earth();
       lookfrom = point3d{13, 2, 3};
       lookat = point3d{0, 0, 0};
-      vfov = 20.0;
+      background_color = color_rgb(0, 0, 0);
+      vfov = 40.0;
       break;
     default:
       world = one_sphere();
       lookfrom = point3d{13, 2, 3};
       lookat = point3d{0, 0, 0};
       vfov = 20.0;
-      background_color = color_rgb{0.7, 0.7, 0.7};
+      background_color = color_rgb{1.0, 1.0, 1.0};
   }
   int image_h = static_cast<int>(image_w / aspect_ratio);
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
