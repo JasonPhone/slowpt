@@ -21,25 +21,28 @@ constexpr int JPG_OUT = 1;
 /**
  * cast a ray to the world and get its color
  */
-color_rgb ray_color(ray const &r, color_rgb const &background,
+color_rgb ray_color(ray const &r_in, color_rgb const &background,
                     base_object const &world, int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
   // if ray reaches max bounce it gets nothing
   if (bounce_depth <= 0) return color_rgb{0, 0, 0};
   // if ray does not hit anything it gets backround color
-  if (!world.hit(r, 0.001, INF_DBL, rec)) return background;
+  if (!world.hit(r_in, 0.001, INF_DBL, rec)) return background;
   // shading are handled by object_list
   ray scattered;
   color_rgb attenuation;
   color_rgb emit_color = rec.mat_ptr->emit(rec.u, rec.v, rec.p);
   double sample_pdf;
   // if the material scatters light this ray gets scatter and emit
-  if (rec.mat_ptr->scatter(r, rec, attenuation, scattered, sample_pdf))
-    return emit_color + attenuation * ray_color(scattered, background, world,
-                                                bounce_depth - 1);
-  else
+  if (!rec.mat_ptr->scatter(r_in, rec, attenuation, scattered, sample_pdf))
     return emit_color;
+  // clang-format off
+  return emit_color
+         + attenuation * rec.mat_ptr->scatter_pdf(r_in, rec, scattered)
+                        * ray_color(scattered, background,
+                                    world,     bounce_depth - 1) / sample_pdf;
+  // clang-format on
 }
 int main(int argc, char *argv[]) {
   int scene_idx = 0;
@@ -179,7 +182,8 @@ int main(int argc, char *argv[]) {
       }
       if (OUT_FORMAT == JPG_OUT)
         // index correction
-        write_color(data, pixel_color, spp, image_w, image_h, (image_h - 1 - i), j);
+        write_color(data, pixel_color, spp, image_w, image_h, (image_h - 1 - i),
+                    j);
       else
         write_color(std::cout, pixel_color, spp);
     }

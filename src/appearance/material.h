@@ -13,7 +13,7 @@ class base_material {
                        double& sample_pdf) const {
     return false;
   }
-  virtual double get_scatter_pdf(ray const& r_in, hit_record const& rec,
+  virtual double scatter_pdf(ray const& r_in, hit_record const& rec,
                                  ray const& scattered) const {
     return 0.0;
   }
@@ -33,15 +33,25 @@ class lambertian : public base_material {
   lambertian(std::shared_ptr<texture> t) : albedo_{t} {}
 
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
+                       color_rgb& attenuation, ray& scattered,
+                       double& sample_pdf) const override {
     // auto scatter_dir = rec.normal + random_in_unit_sphere();
-    auto scatter_dir = rec.normal + random_unit_vector();
+    // auto scatter_dir = rec.normal + random_unit_vector();
+    auto scatter_dir = random_in_hemisphere(rec.normal);
     // test if zero direction
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
     scattered = ray(rec.p, unit_vector(scatter_dir), r_in.time());
-    // always scatter, but have an attenuation
     attenuation = albedo_->value(rec.u, rec.v, rec.p);
+    sample_pdf =
+        dot(unit_vector(rec.normal), unit_vector(scattered.direction())) / PI;
+    // sample_pdf = .5/PI;
     return true;
+  }
+  virtual double scatter_pdf(ray const& r_in, hit_record const& rec,
+                             ray const& scattered) const override {
+    auto cosine =
+        dot(unit_vector(rec.normal), unit_vector(scattered.direction()));
+    return cosine < 0 ? 0 : cosine / PI;
   }
 };
 
@@ -56,7 +66,8 @@ class metal : public base_material {
   metal(std::shared_ptr<texture> t, double f)
       : albedo_{t}, fuzz_{f > 1.0 ? 1.0 : f} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
+                       color_rgb& attenuation, ray& scattered,
+                       double& sample_pdf) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
     scattered =
         ray(rec.p, reflect_dir + fuzz_ * random_in_unit_sphere(), r_in.time());
@@ -85,7 +96,8 @@ class dielectric : public base_material {
     return ref_x + ref_y;
   }
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
+                       color_rgb& attenuation, ray& scattered,
+                       double& sample_pdf) const override {
     attenuation = color_rgb{1.0, 1.0, 1.0};
     double refraction_ratio = rec.front_face ? (1.0 / ir_) : ir_;
     vec3d unit_in_dir = unit_vector(r_in.direction());
@@ -121,7 +133,8 @@ class diffuse_light : public base_material {
   diffuse_light(shared_ptr<texture> txt) : emit_{txt} {}
   diffuse_light(color_rgb const& c) : emit_{make_shared<solid_texture>(c)} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
+                       color_rgb& attenuation, ray& scattered,
+                       double& sample_pdf) const override {
     return false;  // a diffuse light source does not reflect rays
   }
   virtual color_rgb emit(double u, double v, point3d const& p) const override {
@@ -140,7 +153,8 @@ class isotropic_medium : public base_material {
   isotropic_medium(color_rgb clr) : albedo_{make_shared<solid_texture>(clr)} {}
   isotropic_medium(shared_ptr<texture> text) : albedo_{text} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
+                       color_rgb& attenuation, ray& scattered,
+                       double& sample_pdf) const override {
     // in all random direction
     scattered = ray{rec.p, random_in_unit_sphere(), r_in.time()};
     // just the albedo

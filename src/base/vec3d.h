@@ -92,6 +92,7 @@ inline vec3d cross(const vec3d &u, const vec3d &v) {
                u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 inline vec3d unit_vector(vec3d v) { return v / v.norm(); }
+
 // random vector in unit sphere, from the center
 inline vec3d random_in_unit_sphere() {
   while (true) {
@@ -100,7 +101,36 @@ inline vec3d random_in_unit_sphere() {
   }
 }
 inline vec3d random_unit_vector() {
-  return unit_vector(random_in_unit_sphere());
+  auto r1 = random_double(0, 2 * PI);
+  auto r2 = random_double();
+  auto x = cos(r1) * 2 * sqrt(r2 * (1 - r2));
+  auto y = sin(r1) * 2 * sqrt(r2 * (1 - r2));
+  auto z = 1 - 2 * r2;
+  return vec3d{x, y, z};
+}
+/**
+ * random direction on z-axis hemisphere
+ */
+inline vec3d random_in_hemisphere(vec3d const &normal) {
+  auto r1 = random_double(0, 2 * PI);
+  auto r2 = random_double();
+  auto x = cos(r1) * 2 * sqrt(r2 * (1 - r2));
+  auto y = sin(r1) * 2 * sqrt(r2 * (1 - r2));
+  auto z = 1 - r2;
+  return vec3d{x, y, z};
+}
+/**
+ * random direction on hemisphere
+ * with pdf of cos(theta) / PI
+ * where theta is radian between direction and z-axis
+ */
+inline vec3d random_cosine_on_sphere() {
+  auto phi = random_double(0, 2 * PI);
+  auto r2 = random_double();
+  auto z = sqrt(1 - r2);
+  auto x = cos(phi) * sqrt(r2);
+  auto y = sin(phi) * sqrt(r2);
+  return vec3d{x, y, z};
 }
 inline vec3d random_in_unit_disk() {
   while (true) {
