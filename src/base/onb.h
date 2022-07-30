@@ -22,7 +22,7 @@ class onb {
 
   void build_from_w(const vec3d&);
 
- public:
+ private:
   vec3d axis[3];
 };
 

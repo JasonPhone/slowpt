@@ -50,7 +50,7 @@ class lambertian : public base_material {
   }
   virtual double scatter_pdf(ray const& r_in, hit_record const& rec,
                              ray const& scattered) const override {
-    // return .5 / PI;
+    return .5 / PI;
     auto cosine =
         dot(unit_vector(rec.normal), unit_vector(scattered.direction()));
     return cosine < 0 ? 0 : cosine / PI;
