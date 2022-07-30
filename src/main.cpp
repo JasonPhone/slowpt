@@ -16,6 +16,8 @@ in linux
 #include "objectlist.h"
 #include "prefabs.h"
 #include "rt_utils.h"
+constexpr int PPM_OUT = 0;
+constexpr int JPG_OUT = 1;
 /**
  * cast a ray to the world and get its color
  */
@@ -41,9 +43,16 @@ color_rgb ray_color(ray const &r, color_rgb const &background,
 }
 int main(int argc, char *argv[]) {
   int scene_idx = 0;
+  char *path;
+  int OUT_FORMAT = PPM_OUT;
   if (argc > 1) {
     scene_idx = atoi(argv[1]);
   }
+  if (argc > 2) {
+    path = argv[2];
+    OUT_FORMAT = JPG_OUT;
+  }
+
   std::srand(std::time(nullptr));
   /******** Image config ********/
   double aspect_ratio = 16.0 / 9.0;
@@ -152,7 +161,11 @@ int main(int argc, char *argv[]) {
 
   /******** Render ********/
   bvh_node world_bvh{world, apt_open, apt_close};
-  std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";
+  char *data;
+  if (OUT_FORMAT == JPG_OUT)
+    data = (char *)malloc(image_w * image_h * 3 * sizeof(char));
+  else
+    std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";
   for (int i = image_h - 1; i >= 0; i--) {
     std::cerr << "\rScanlines remaining: " << std::setw(3) << i << "/"
               << image_h << std::flush;
@@ -164,10 +177,18 @@ int main(int argc, char *argv[]) {
         ray r = cam.ray_at(u, v);
         pixel_color += ray_color(r, background_color, world_bvh, max_bounce);
       }
-      write_color(std::cout, pixel_color, spp);
+      if (OUT_FORMAT == JPG_OUT)
+        // index correction
+        write_color(data, pixel_color, spp, image_w, image_h, (image_h - 1 - i), j);
+      else
+        write_color(std::cout, pixel_color, spp);
     }
   }
-
+  if (OUT_FORMAT == JPG_OUT) {
+    std::cerr << "\nWriting into " << path;
+    stbi_write_jpg(path, image_w, image_h, 3, data, 95);
+    free(data);
+  }
   std::cerr << "\nDone.\n";
   return 0;
 }

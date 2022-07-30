@@ -20,3 +20,7 @@ set(MAIN_SRC
 add_executable(slowpt
   ${MAIN_SRC}
 )
+
+add_executable(test
+  test.cpp
+)
