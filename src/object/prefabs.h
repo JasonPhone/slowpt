@@ -114,7 +114,7 @@ object_list cornell_box() {
   // objects.add(make_shared<flip_face>(make_shared<xz_rectangle>(213, 343, 227, 332, 554, light)));
   objects.add(make_shared<xz_rectangle>(213, 343, 227, 332, 554, light, vec3d{0, -1, 0}));
   objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 0, white));
-  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white));
+  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white, vec3d{0, -1, 0}));
   objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
 
   shared_ptr<base_object> box1 =
