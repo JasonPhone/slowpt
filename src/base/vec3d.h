@@ -96,9 +96,11 @@ inline vec3d unit_vector(vec3d v) { return v / v.norm(); }
 inline vec3d random_in_unit_sphere() {
   while (true) {
     auto p = vec3d::random(-1, 1);
-    if (p.norm2() >= 1.0) continue;
-    return p;
+    if (p.norm2() <= 1.0) return p;
   }
+}
+inline vec3d random_unit_vector() {
+  return unit_vector(random_in_unit_sphere());
 }
 inline vec3d random_in_unit_disk() {
   while (true) {
@@ -106,9 +108,6 @@ inline vec3d random_in_unit_disk() {
     if (p.norm2() >= 1) continue;
     return p;
   }
-}
-inline vec3d random_unit_vector() {
-  return unit_vector(random_in_unit_sphere());
 }
 vec3d reflect(const vec3d &v, const vec3d &N) { return v - 2 * dot(v, N) * N; }
 

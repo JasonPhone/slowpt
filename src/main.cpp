@@ -98,11 +98,18 @@ int main(int argc, char *argv[]) {
       aspect_ratio = 1.0;
       image_w = 600;
       spp = 200;
-      max_bounce = 30;
+      max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
+
       lookfrom = point3d(278, 278, -800);
       lookat = point3d(278, 278, 0);
+      vup = vec3d{0, 1, 0};
+      dist_to_focus = 10.0;
+      aperture = 0.0;
       vfov = 40.0;
+
+      apt_open = 0.0;
+      apt_close = 1.0;
       break;
     case 7:
       world = cornell_smoke();
@@ -141,6 +148,7 @@ int main(int argc, char *argv[]) {
   int image_h = static_cast<int>(image_w / aspect_ratio);
   camera cam{lookfrom, lookat,        vup,      vfov,     aspect_ratio,
              aperture, dist_to_focus, apt_open, apt_close};
+
   /******** Render ********/
   bvh_node world_bvh{world, apt_open, apt_close};
   std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";

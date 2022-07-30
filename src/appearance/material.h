@@ -27,7 +27,7 @@ class lambertian : public base_material {
 
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
-    auto scatter_dir = rec.normal + random_unit_vector();
+    auto scatter_dir = rec.normal + random_in_unit_sphere();
     // test if zero direction
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
     scattered = ray(rec.p, scatter_dir, r_in.time());
