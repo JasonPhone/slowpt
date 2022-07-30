@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
       world = cornell_box();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp = 200;
+      spp = 10;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
 

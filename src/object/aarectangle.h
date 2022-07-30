@@ -55,6 +55,7 @@ class xz_rectangle : public base_object {
  private:
   double x0_, x1_, z0_, z1_, y_;
   shared_ptr<base_material> mat_ptr_;
+  vec3d normal_;
 
  public:
   xz_rectangle() {}
@@ -65,10 +66,18 @@ class xz_rectangle : public base_object {
    * @param z0 min in z axis
    * @param z1 max in z axis
    * @param y  y position
+   * @param normal the normal, default (0, 1, 0)
    */
   xz_rectangle(double x0, double x1, double z0, double z1, double y,
-               shared_ptr<base_material> mat)
-      : x0_{x0}, x1_{x1}, z0_{z0}, z1_{z1}, y_{y}, mat_ptr_{mat} {}
+               shared_ptr<base_material> mat,
+               vec3d const& normal = vec3d{0, 1, 0})
+      : x0_{x0},
+        x1_{x1},
+        z0_{z0},
+        z1_{z1},
+        y_{y},
+        mat_ptr_{mat},
+        normal_{normal} {}
   // time may be needed for moving objects
   virtual void get_uv(double const t, point3d const& p, double& u,
                       double& v) const override {
@@ -84,8 +93,9 @@ class xz_rectangle : public base_object {
     rec.u = (x - x0_) / (x1_ - x0_);
     rec.v = (z - z0_) / (z1_ - z0_);
     rec.t = t;
-    auto outward_normal = vec3d{0, 1, 0};
+    auto outward_normal = normal_;
     rec.set_face_normal(r, outward_normal);
+    if (!rec.front_face) return false;
     rec.mat_ptr = mat_ptr_;
     rec.p = r.at(t);
     return true;
