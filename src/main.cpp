@@ -37,6 +37,19 @@ color_rgb ray_color(ray const &r_in, color_rgb const &background,
   // if the material scatters light this ray gets scatter and emit
   if (!rec.mat_ptr->scatter(r_in, rec, attenuation, scattered, sample_pdf))
     return emit_color;
+  auto on_light = point3d(random_double(213, 343), 554, random_double(227, 332));
+  auto to_light = on_light - rec.p;
+  auto distance_squared = to_light.norm2();
+  to_light = unit_vector(to_light);
+
+  if (dot(to_light, rec.normal) < 0) return emit_color;
+
+  double light_area = (343 - 213) * (332 - 227);
+  auto light_cosine = fabs(to_light.y());
+  if (light_cosine < 0.000001) return emit_color;
+
+  sample_pdf = distance_squared / (light_cosine * light_area);
+  scattered = ray(rec.p, to_light, r_in.time());
   // clang-format off
   return emit_color
          + attenuation * rec.mat_ptr->scatter_pdf(r_in, rec, scattered)

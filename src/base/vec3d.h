@@ -111,7 +111,7 @@ inline vec3d random_unit_vector() {
 /**
  * random direction on z-axis hemisphere
  */
-inline vec3d random_in_hemisphere(vec3d const &normal) {
+inline vec3d random_in_hemisphere() {
   auto r1 = random_double(0, 2 * PI);
   auto r2 = random_double();
   auto x = cos(r1) * 2 * sqrt(r2 * (1 - r2));
@@ -125,11 +125,14 @@ inline vec3d random_in_hemisphere(vec3d const &normal) {
  * where theta is radian between direction and z-axis
  */
 inline vec3d random_cosine_on_sphere() {
-  auto phi = random_double(0, 2 * PI);
+  auto r1 = random_double();
   auto r2 = random_double();
   auto z = sqrt(1 - r2);
+
+  auto phi = 2 * PI * r1;
   auto x = cos(phi) * sqrt(r2);
   auto y = sin(phi) * sqrt(r2);
+
   return vec3d{x, y, z};
 }
 inline vec3d random_in_unit_disk() {
