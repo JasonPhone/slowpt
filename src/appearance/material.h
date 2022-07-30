@@ -15,15 +15,15 @@ class base_material {
   }
 };
 
-class lambertian_material : public base_material {
+class lambertian : public base_material {
  private:
   std::shared_ptr<texture> albedo_;
 
  public:
-  lambertian_material(color_rgb const& c)
+  lambertian(color_rgb const& c)
       : albedo_{std::make_shared<solid_texture>(c)} {}
 
-  lambertian_material(std::shared_ptr<texture> t) : albedo_{t} {}
+  lambertian(std::shared_ptr<texture> t) : albedo_{t} {}
 
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
@@ -37,27 +37,28 @@ class lambertian_material : public base_material {
   }
 };
 
-class metal_material : public base_material {
+class metal : public base_material {
  private:
   std::shared_ptr<texture> albedo_;
   double fuzz_;
 
  public:
-  metal_material(color_rgb const& a, double f)
+  metal(color_rgb const& a, double f)
       : albedo_{make_shared<solid_texture>(a)}, fuzz_{f > 1.0 ? 1.0 : f} {}
-  metal_material(std::shared_ptr<texture> t, double f)
+  metal(std::shared_ptr<texture> t, double f)
       : albedo_{t}, fuzz_{f > 1.0 ? 1.0 : f} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
     scattered =
-        ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
+        ray(rec.p, reflect_dir + fuzz_ * random_in_unit_sphere(), r_in.time());
+        // ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
     attenuation = albedo_->value(rec.u, rec.v, rec.p);
     return (dot(rec.normal, scattered.direction()) > 0.0);
   }
 };
 
-class dielectric_material : public base_material {
+class dielectric : public base_material {
  private:
   double ir_;
   static double reflectance(double cosine, double ref_idx) {
@@ -68,7 +69,7 @@ class dielectric_material : public base_material {
   }
 
  public:
-  dielectric_material(double index_of_refraction) : ir_{index_of_refraction} {}
+  dielectric(double index_of_refraction) : ir_{index_of_refraction} {}
   vec3d refract(const vec3d& uv, const vec3d& N, double r_ratio) const {
     auto cos_theta = fmin(dot(-uv, N), 1.0);  // for precision
     vec3d ref_x = r_ratio * (uv + cos_theta * N);

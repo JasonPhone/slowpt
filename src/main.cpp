@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   /******** Image config ********/
   double aspect_ratio = 16.0 / 9.0;
   int image_w = 400;
-  int spp_sqrt = 10;
+  int spp = 100;
   int max_bounce = 20;
   color_rgb background_color{0, 0, 0};
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
       world = cornell_box();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp_sqrt = 10;
+      spp = 200;
       max_bounce = 30;
       background_color = color_rgb(0, 0, 0);
       lookfrom = point3d(278, 278, -800);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
       world = cornell_smoke();
       aspect_ratio = 1.0;
       image_w = 600;
-      spp_sqrt = 14;
+      spp = 200;
       lookfrom = point3d(278, 278, -800);
       lookat = point3d(278, 278, 0);
       vfov = 40.0;
@@ -116,8 +116,8 @@ int main(int argc, char *argv[]) {
     case 8:
       world = final_scene();
       aspect_ratio = 1.0;
-      image_w = 600;
-      spp_sqrt = 10;
+      image_w = 800;
+      spp = 10000;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
       lookfrom = point3d(478, 278, -600);
@@ -149,19 +149,13 @@ int main(int argc, char *argv[]) {
               << image_h << std::flush;
     for (int j = 0; j < image_w; j++) {
       color_rgb pixel_color{0, 0, 0};  // sample a pixel
-      for (int si = 0; si < spp_sqrt; si++) {
-        for (int sj = 0; sj < spp_sqrt; sj++) {
-          // stratified sampling
-          // auto u = (j + (1.0 * sj + random_double()) / spp_sqrt) / (image_w -
-          // 1); auto v = (i + (1.0 * si + random_double()) / spp_sqrt) /
-          // (image_h - 1); normal random sampling
-          auto u = (j + random_double()) / (image_w - 1);
-          auto v = (i + random_double()) / (image_h - 1);
-          ray r = cam.ray_at(u, v);
-          pixel_color += ray_color(r, background_color, world_bvh, max_bounce);
-        }
+      for (int si = 0; si < spp; si++) {
+        auto u = (j + random_double()) / (image_w - 1);
+        auto v = (i + random_double()) / (image_h - 1);
+        ray r = cam.ray_at(u, v);
+        pixel_color += ray_color(r, background_color, world_bvh, max_bounce);
       }
-      write_color(std::cout, pixel_color, spp_sqrt * spp_sqrt);
+      write_color(std::cout, pixel_color, spp);
     }
   }
 
