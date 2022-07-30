@@ -9,7 +9,14 @@
 class base_material {
  public:
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered) const = 0;
+                       color_rgb& attenuation, ray& scattered,
+                       double& sample_pdf) const {
+    return false;
+  }
+  virtual double get_scatter_pdf(ray const& r_in, hit_record const& rec,
+                                 ray const& scattered) const {
+    return 0.0;
+  }
   virtual color_rgb emit(double u, double v, point3d const& p) const {
     return color_rgb{0, 0, 0};  // we do not emit light by default
   }
@@ -26,7 +33,7 @@ class lambertian : public base_material {
   lambertian(std::shared_ptr<texture> t) : albedo_{t} {}
 
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
     auto scatter_dir = rec.normal + random_in_unit_sphere();
     // test if zero direction
     if (scatter_dir.near_zero()) scatter_dir = rec.normal;
@@ -48,11 +55,11 @@ class metal : public base_material {
   metal(std::shared_ptr<texture> t, double f)
       : albedo_{t}, fuzz_{f > 1.0 ? 1.0 : f} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
     vec3d reflect_dir = reflect(unit_vector(r_in.direction()), rec.normal);
     scattered =
         ray(rec.p, reflect_dir + fuzz_ * random_in_unit_sphere(), r_in.time());
-        // ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
+    // ray(rec.p, reflect_dir + fuzz_ * random_unit_vector(), r_in.time());
     attenuation = albedo_->value(rec.u, rec.v, rec.p);
     return (dot(rec.normal, scattered.direction()) > 0.0);
   }
@@ -77,7 +84,7 @@ class dielectric : public base_material {
     return ref_x + ref_y;
   }
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
     attenuation = color_rgb{1.0, 1.0, 1.0};
     double refraction_ratio = rec.front_face ? (1.0 / ir_) : ir_;
     vec3d unit_in_dir = unit_vector(r_in.direction());
@@ -113,7 +120,7 @@ class diffuse_light : public base_material {
   diffuse_light(shared_ptr<texture> txt) : emit_{txt} {}
   diffuse_light(color_rgb const& c) : emit_{make_shared<solid_texture>(c)} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
     return false;  // a diffuse light source does not reflect rays
   }
   virtual color_rgb emit(double u, double v, point3d const& p) const override {
@@ -132,7 +139,7 @@ class isotropic_medium : public base_material {
   isotropic_medium(color_rgb clr) : albedo_{make_shared<solid_texture>(clr)} {}
   isotropic_medium(shared_ptr<texture> text) : albedo_{text} {}
   virtual bool scatter(const ray& r_in, const hit_record& rec,
-                       color_rgb& attenuation, ray& scattered) const override {
+                       color_rgb& attenuation, ray& scattered, double &sample_pdf) const override {
     // in all random direction
     scattered = ray{rec.p, random_in_unit_sphere(), r_in.time()};
     // just the albedo
