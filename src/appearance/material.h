@@ -37,18 +37,26 @@ class lambertian : public base_material {
   virtual bool scatter(const ray& r_in, const hit_record& rec,
                        color_rgb& attenuation, ray& scattered,
                        double& sample_pdf) const override {
+    attenuation = albedo_->value(rec.u, rec.v, rec.p);
+
     onb uvw;
     uvw.build_from_w(rec.normal);
+
+    // cos(theta)/PI pdf
     auto scatter_dir = uvw.local(random_cosine_on_sphere());
-    // test if zero direction
-    // if (scatter_dir.near_zero()) scatter_dir = rec.normal;
     scattered = ray(rec.p, unit_vector(scatter_dir), r_in.time());
-    attenuation = albedo_->value(rec.u, rec.v, rec.p);
     sample_pdf = dot(uvw.w(), scattered.direction()) / PI;
+
+    // uniform hemisphere pdf
+    // auto scatter_dir = uvw.local(unit_vector(random_in_hemisphere()));
+    // scattered = ray{rec.p, unit_vector(scatter_dir), r_in.time()};
+    // sample_pdf = .5 / PI;
+
     return true;
   }
   virtual double scatter_pdf(ray const& r_in, hit_record const& rec,
                              ray const& scattered) const override {
+    // return .5 / PI;
     auto cosine =
         dot(unit_vector(rec.normal), unit_vector(scattered.direction()));
     return cosine < 0 ? 0 : cosine / PI;
