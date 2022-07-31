@@ -23,7 +23,8 @@ constexpr int JPG_OUT = 1;
  * cast a ray to the world and get its color
  */
 color_rgb ray_color(ray const &r_in, color_rgb const &background,
-                    base_object const &world, int bounce_depth) {
+                    base_object const &world, shared_ptr<base_object> &lights,
+                    int bounce_depth) {
   /******** Objects ********/
   hit_record rec;
   // if ray reaches max bounce it gets nothing
@@ -42,11 +43,15 @@ color_rgb ray_color(ray const &r_in, color_rgb const &background,
   cosine_pdf p{rec.normal};
   scattered = ray{rec.p, p.generate(), r_in.time()};
   sample_pdf =p.value(scattered.direction());
+  // obj_pdf p{lights, rec.p};
+  // scattered = ray{rec.p, p.generate(), r_in.time()};
+  // sample_pdf = p.value(scattered.direction());
+
   // clang-format off
   return emit_color
          + attenuation * rec.mat_ptr->scatter_pdf(r_in, rec, scattered)
-                        * ray_color(scattered, background,
-                                    world,     bounce_depth - 1) / sample_pdf;
+                       * ray_color(scattered, background, world,
+                                   lights,    bounce_depth - 1) / sample_pdf;
   // clang-format on
 }
 int main(int argc, char *argv[]) {
@@ -113,8 +118,9 @@ int main(int argc, char *argv[]) {
       break;
     case 6:
       world = cornell_box();
+
       aspect_ratio = 1.0;
-      image_w = 600;
+      image_w = 500;
       spp = 200;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
@@ -169,11 +175,15 @@ int main(int argc, char *argv[]) {
 
   /******** Render ********/
   bvh_node world_bvh{world, apt_open, apt_close};
+  shared_ptr<base_object> lights = make_shared<xz_rectangle>(
+      213, 343, 227, 332, 554, shared_ptr<base_material>());
+
   char *data;
   if (OUT_FORMAT == JPG_OUT)
     data = (char *)malloc(image_w * image_h * 3 * sizeof(char));
   else
     std::cout << "P3\n" << image_w << ' ' << image_h << "\n255\n";
+
   for (int i = image_h - 1; i >= 0; i--) {
     std::cerr << "\rScanlines remaining: " << std::setw(3) << i << "/"
               << image_h << std::flush;
@@ -183,7 +193,8 @@ int main(int argc, char *argv[]) {
         auto u = (j + random_double()) / (image_w - 1);
         auto v = (i + random_double()) / (image_h - 1);
         ray r = cam.ray_at(u, v);
-        pixel_color += ray_color(r, background_color, world_bvh, max_bounce);
+        pixel_color +=
+            ray_color(r, background_color, world_bvh, lights, max_bounce);
       }
       if (OUT_FORMAT == JPG_OUT)
         // index correction

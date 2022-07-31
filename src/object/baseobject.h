@@ -97,14 +97,15 @@ class rotate_y : public base_object {
 };
 rotate_y::rotate_y(shared_ptr<base_object> obj, double angle) : obj_ptr_{obj} {
   // rotate all the xz coords and take max of them as new bounding box
-  auto radius = deg_to_rad(angle);  // convert
+  auto radians = deg_to_rad(angle);  // convert
   // record for saving time
-  sin_theta_ = sin(radius);
-  cos_theta_ = cos(radius);
+  sin_theta_ = sin(radians);
+  cos_theta_ = cos(radians);
   // prepare for bouding_box(), save time
   has_box_ = obj_ptr_->bounding_box(0, 1, bbox_);
   // hold the max and min on all axis
-  point3d minp{INF_DBL, INF_DBL, INF_DBL}, maxp{-INF_DBL, -INF_DBL, -INF_DBL};
+  point3d minp{INF_DBL, INF_DBL, INF_DBL};
+  point3d maxp{-INF_DBL, -INF_DBL, -INF_DBL};
   // loop to update the eight vertices of bbox_
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
@@ -151,31 +152,9 @@ bool rotate_y::hit(const ray& r, double t_min, double t_max,
   normal[2] = -sin_theta_ * rec.normal[0] + cos_theta_ * rec.normal[2];
 
   rec.p = p;
-  // Just move back, I think we don't need to reset the normal.
-  // Plus, the normal of rec is always against ray direction
-  // rec.set_face_normal(rot_r, normal);
+  // It's a rotation, so we MUST reset the normal
+  rec.set_face_normal(rot_r, normal);
 
   return true;
 }
-// class flip_face : public base_object {
-//  public:
-//   flip_face(shared_ptr<base_object> p) : ptr(p) {}
-
-//   virtual bool hit(const ray& r, double t_min, double t_max,
-//                    hit_record& rec) const override {
-//     if (!ptr->hit(r, t_min, t_max, rec)) return false;
-
-//     rec.front_face = !rec.front_face;
-//     return true;
-//   }
-
-//   virtual bool bounding_box(double time0, double time1,
-//                             aabb& output_box) const override {
-//     return ptr->bounding_box(time0, time1, output_box);
-//   }
-
-//  public:
-//   shared_ptr<base_object> ptr;
-// };
-
 #endif
