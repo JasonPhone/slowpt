@@ -33,7 +33,7 @@ color_rgb ray_color(ray const &r_in, color_rgb const &background,
   // shading are handled by object_list
   ray scattered;
   color_rgb attenuation;
-  color_rgb emit_color = rec.mat_ptr->emit(rec.u, rec.v, rec.p);
+  color_rgb emit_color = rec.mat_ptr->emit(r_in, rec, rec.u, rec.v, rec.p);
   double sample_pdf;
   // if the material scatters light this ray gets scatter and emit
   if (!rec.mat_ptr->scatter(r_in, rec, attenuation, scattered, sample_pdf))

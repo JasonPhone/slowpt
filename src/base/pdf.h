@@ -26,18 +26,18 @@ class cosine_pdf : public pdf {
     return uvw_.local(random_cosine_on_sphere());
   }
 };
-class hemisphere_uniform_pdf : public pdf {
- private:
-  onb uvw_;
+// class hemisphere_uniform_pdf : public pdf {
+//  private:
+//   onb uvw_;
 
- public:
-  hemisphere_uniform_pdf(vec3d const &normal) { this->uvw_.build_from_w(normal); }
-  virtual double value(vec3d const &dir) const override {
-    return 0.5/PI;
-  }
-  virtual vec3d generate() const override {
-    return uvw_.local(random_in_hemisphere());
-  }
-};
+//  public:
+//   hemisphere_uniform_pdf(vec3d const &normal) { this->uvw_.build_from_w(normal); }
+//   virtual double value(vec3d const &dir) const override {
+//     return 0.5/PI;
+//   }
+//   virtual vec3d generate() const override {
+//     return uvw_.local(random_in_hemisphere());
+//   }
+// };
 
 #endif

@@ -31,6 +31,12 @@ class base_object {
   virtual bool hit(const ray& r, double t_min, double t_max,
                    hit_record& rec) const = 0;
   virtual bool bounding_box(double tm0, double tm1, aabb& buf_aabb) const = 0;
+  virtual double pdf_value(point3d const &origin, vec3d const &direction) const {
+    return 0.0;
+  }
+  virtual vec3d random_sample(vec3d const &origin) const {
+    return vec3d{1, 0, 0};
+  }
 };
 
 class translate : public base_object {

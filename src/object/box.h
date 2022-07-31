@@ -27,9 +27,9 @@ box::box(point3d const& p0, point3d const& p1,
   box_max_ = p1;
 
   faces_.add(make_shared<xy_rectangle>(box_min_.x(), box_max_.x(), box_min_.y(),
-                                       box_max_.y(), box_min_.z(), mat_ptr));
+                                       box_max_.y(), box_min_.z(), mat_ptr, vec3d{0, 0, -1}));
   faces_.add(make_shared<xy_rectangle>(box_min_.x(), box_max_.x(), box_min_.y(),
-                                       box_max_.y(), box_max_.z(), mat_ptr));
+                                       box_max_.y(), box_max_.z(), mat_ptr, vec3d{0, 0, 1}));
 
   faces_.add(make_shared<xz_rectangle>(box_min_.x(), box_max_.x(), box_min_.z(),
                                        box_max_.z(), box_min_.y(), mat_ptr, vec3d{0, -1, 0}));
@@ -37,9 +37,9 @@ box::box(point3d const& p0, point3d const& p1,
                                        box_max_.z(), box_max_.y(), mat_ptr, vec3d{0, 1, 0}));
 
   faces_.add(make_shared<yz_rectangle>(box_min_.y(), box_max_.y(), box_min_.z(),
-                                       box_max_.z(), box_min_.x(), mat_ptr));
+                                       box_max_.z(), box_min_.x(), mat_ptr, vec3d{-1, 0, 0}));
   faces_.add(make_shared<yz_rectangle>(box_min_.y(), box_max_.y(), box_min_.z(),
-                                       box_max_.z(), box_max_.x(), mat_ptr));
+                                       box_max_.z(), box_max_.x(), mat_ptr, vec3d{1, 0, 0}));
 }
 
 void box::get_uv(double const t, point3d const& p, double& u, double& v) const {

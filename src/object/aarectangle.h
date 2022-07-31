@@ -8,6 +8,7 @@ class xy_rectangle : public base_object {
  private:
   double x0_, x1_, y0_, y1_, z_;
   shared_ptr<base_material> mat_ptr_;
+  vec3d normal_;
 
  public:
   xy_rectangle() {}
@@ -18,10 +19,17 @@ class xy_rectangle : public base_object {
    * @param y0 min in y axis
    * @param y1 max in y axis
    * @param z  z position
+   * @param normal normal, default (0, 0, 1)
    */
   xy_rectangle(double x0, double x1, double y0, double y1, double z,
-               shared_ptr<base_material> mat)
-      : x0_{x0}, x1_{x1}, y0_{y0}, y1_{y1}, z_{z}, mat_ptr_{mat} {}
+               shared_ptr<base_material> mat, vec3d const& normal = vec3d{0, 0, 1})
+      : x0_{x0},
+        x1_{x1},
+        y0_{y0},
+        y1_{y1},
+        z_{z},
+        mat_ptr_{mat},
+        normal_{normal} {}
   // time may be needed for moving objects
   virtual void get_uv(double const t, point3d const& p, double& u,
                       double& v) const override {
@@ -37,7 +45,7 @@ class xy_rectangle : public base_object {
     rec.u = (x - x0_) / (x1_ - x0_);
     rec.v = (y - y0_) / (y1_ - y0_);
     rec.t = t;
-    auto outward_normal = vec3d{0, 0, 1};
+    auto outward_normal = normal_;
     rec.set_face_normal(r, outward_normal);
     rec.mat_ptr = mat_ptr_;
     rec.p = r.at(t);
@@ -95,7 +103,6 @@ class xz_rectangle : public base_object {
     rec.t = t;
     auto outward_normal = normal_;
     rec.set_face_normal(r, outward_normal);
-    if (!rec.front_face) return false;
     rec.mat_ptr = mat_ptr_;
     rec.p = r.at(t);
     return true;
@@ -112,6 +119,7 @@ class yz_rectangle : public base_object {
  private:
   double y0_, y1_, z0_, z1_, x_;
   shared_ptr<base_material> mat_ptr_;
+  vec3d normal_;
 
  public:
   yz_rectangle() {}
@@ -122,10 +130,11 @@ class yz_rectangle : public base_object {
    * @param z0 min in z axis
    * @param z1 max in z axis
    * @param x  x position
+   * @param normal default (1, 0, 0)
    */
   yz_rectangle(double y0, double y1, double z0, double z1, double x,
-               shared_ptr<base_material> mat)
-      : y0_{y0}, y1_{y1}, z0_{z0}, z1_{z1}, x_{x}, mat_ptr_{mat} {}
+               shared_ptr<base_material> mat, vec3d const &normal = vec3d{1, 0, 0})
+      : y0_{y0}, y1_{y1}, z0_{z0}, z1_{z1}, x_{x}, mat_ptr_{mat}, normal_{normal} {}
   // time may be needed for moving objects
   virtual void get_uv(double const t, point3d const& p, double& u,
                       double& v) const override {
@@ -141,7 +150,7 @@ class yz_rectangle : public base_object {
     rec.u = (y - y0_) / (y1_ - y0_);
     rec.v = (z - z0_) / (z1_ - z0_);
     rec.t = t;
-    auto outward_normal = vec3d{1, 0, 0};
+    auto outward_normal = this->normal_;
     rec.set_face_normal(r, outward_normal);
     rec.mat_ptr = mat_ptr_;
     rec.p = r.at(t);
