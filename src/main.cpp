@@ -40,13 +40,12 @@ color_rgb ray_color(ray const &r_in, color_rgb const &background,
   if (!rec.mat_ptr->scatter(r_in, rec, attenuation, scattered, sample_pdf))
     return emit_color;
 
-  // cosine_pdf p{rec.normal};
-  // scattered = ray{rec.p, p.generate(), r_in.time()};
-  // sample_pdf = p.value(scattered.direction());
+  auto p0 = make_shared<obj_pdf>(lights, rec.p);
+  auto p1 = make_shared<cosine_pdf>(rec.normal);
+  mixture_pdf mixed_pdf{p0, p1, 0.};
 
-  obj_pdf p{lights, rec.p};
-  scattered = ray{rec.p, p.generate(), r_in.time()};
-  sample_pdf = p.value(scattered.direction());
+  scattered = ray{rec.p, mixed_pdf.generate(), r_in.time()};
+  sample_pdf = mixed_pdf.value(scattered.direction());
 
   // clang-format off
   return emit_color
@@ -122,7 +121,7 @@ int main(int argc, char *argv[]) {
 
       aspect_ratio = 1.0;
       image_w = 500;
-      spp = 20;
+      spp = 1000;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
 
