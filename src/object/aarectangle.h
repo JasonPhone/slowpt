@@ -22,7 +22,8 @@ class xy_rectangle : public base_object {
    * @param normal normal, default (0, 0, 1)
    */
   xy_rectangle(double x0, double x1, double y0, double y1, double z,
-               shared_ptr<base_material> mat, vec3d const& normal = vec3d{0, 0, 1})
+               shared_ptr<base_material> mat,
+               vec3d const& normal = vec3d{0, 0, 1})
       : x0_{x0},
         x1_{x1},
         y0_{y0},
@@ -114,6 +115,21 @@ class xz_rectangle : public base_object {
         aabb{point3d{x0_, y_ - 0.0001, z0_}, point3d{x1_, y_ + 0.0001, z1_}};
     return true;
   }
+  virtual double pdf_value(point3d const& origin, vec3d const& dir) const override {
+    hit_record rec;
+    if (!this->hit(ray(origin, dir), 0.001, INF_DBL, rec)) return 0;
+
+    auto area = (x1_ - x0_) * (z1_ - z0_);
+    auto distance_squared = rec.t * rec.t * dir.norm2();
+    auto cosine = fabs(dot(dir, rec.normal) / dir.norm());
+
+    return distance_squared / (cosine * area);
+  }
+
+  virtual vec3d random_sample(point3d const& origin) const override {
+    auto random_point = point3d{random_double(x0_, x1_), y_, random_double(z0_, z1_)};
+    return random_point - origin;
+  }
 };
 class yz_rectangle : public base_object {
  private:
@@ -133,8 +149,15 @@ class yz_rectangle : public base_object {
    * @param normal default (1, 0, 0)
    */
   yz_rectangle(double y0, double y1, double z0, double z1, double x,
-               shared_ptr<base_material> mat, vec3d const &normal = vec3d{1, 0, 0})
-      : y0_{y0}, y1_{y1}, z0_{z0}, z1_{z1}, x_{x}, mat_ptr_{mat}, normal_{normal} {}
+               shared_ptr<base_material> mat,
+               vec3d const& normal = vec3d{1, 0, 0})
+      : y0_{y0},
+        y1_{y1},
+        z0_{z0},
+        z1_{z1},
+        x_{x},
+        mat_ptr_{mat},
+        normal_{normal} {}
   // time may be needed for moving objects
   virtual void get_uv(double const t, point3d const& p, double& u,
                       double& v) const override {
