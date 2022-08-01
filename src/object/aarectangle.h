@@ -59,6 +59,23 @@ class xy_rectangle : public base_object {
         aabb{point3d{x0_, y0_, z_ - 0.0001}, point3d{x1_, y1_, z_ + 0.0001}};
     return true;
   }
+
+  virtual double pdf_value(point3d const& origin,
+                           vec3d const& dir) const override {
+    hit_record rec;
+    if (!this->hit(ray(origin, dir), 0.001, INF_DBL, rec)) return 0;
+
+    auto area = (x1_ - x0_) * (y1_ - y0_);
+    auto distance_squared = rec.t * rec.t * dir.norm2();
+    auto cosine = fabs(dot(dir, rec.normal) / dir.norm());
+
+    return distance_squared / (cosine * area);
+  }
+  virtual vec3d random_sample(point3d const& origin) const override {
+    auto random_point =
+        point3d{random_double(x0_, x1_), random_double(y0_, y1_), z_};
+    return random_point - origin;
+  }
 };
 class xz_rectangle : public base_object {
  private:
@@ -115,7 +132,8 @@ class xz_rectangle : public base_object {
         aabb{point3d{x0_, y_ - 0.0001, z0_}, point3d{x1_, y_ + 0.0001, z1_}};
     return true;
   }
-  virtual double pdf_value(point3d const& origin, vec3d const& dir) const override {
+  virtual double pdf_value(point3d const& origin,
+                           vec3d const& dir) const override {
     hit_record rec;
     if (!this->hit(ray(origin, dir), 0.001, INF_DBL, rec)) return 0;
 
@@ -127,7 +145,8 @@ class xz_rectangle : public base_object {
   }
 
   virtual vec3d random_sample(point3d const& origin) const override {
-    auto random_point = point3d{random_double(x0_, x1_), y_, random_double(z0_, z1_)};
+    auto random_point =
+        point3d{random_double(x0_, x1_), y_, random_double(z0_, z1_)};
     return random_point - origin;
   }
 };
@@ -185,6 +204,23 @@ class yz_rectangle : public base_object {
     buf_aabb =
         aabb{point3d{x_ - 0.0001, y0_, z0_}, point3d{x_ + 0.0001, y1_, z1_}};
     return true;
+  }
+
+  virtual double pdf_value(point3d const& origin,
+                           vec3d const& dir) const override {
+    hit_record rec;
+    if (!this->hit(ray(origin, dir), 0.001, INF_DBL, rec)) return 0;
+
+    auto area = (y1_ - y0_) * (z1_ - z0_);
+    auto distance_squared = rec.t * rec.t * dir.norm2();
+    auto cosine = fabs(dot(dir, rec.normal) / dir.norm());
+
+    return distance_squared / (cosine * area);
+  }
+  virtual vec3d random_sample(point3d const& origin) const override {
+    auto random_point =
+        point3d{x_, random_double(y0_, y1_), random_double(z0_, z1_)};
+    return random_point - origin;
   }
 };
 

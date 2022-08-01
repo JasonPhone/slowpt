@@ -15,9 +15,8 @@ object_list random_scene() {
   auto checker_txt2 = make_shared<checker_texture>(color_rgb{0.2, 0.3, 0.1},
                                                    color_rgb{0.9, 0.9, 0.9});
   // ground is a huge lembertian sphere
-  world.add(
-      make_shared<sphere>(point3d{0, -1000, 0}, 1000,
-                          make_shared<lambertian>(checker_txt1)));
+  world.add(make_shared<sphere>(point3d{0, -1000, 0}, 1000,
+                                make_shared<lambertian>(checker_txt1)));
   // three big balls
   auto material1 = make_shared<dielectric>(1.5);
   world.add(make_shared<sphere>(point3d{0, 1, 0}, 1.0, material1));
@@ -111,11 +110,17 @@ object_list cornell_box() {
 
   objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 555, green));
   objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 0, red));
-  objects.add(make_shared<xz_rectangle>(213, 343, 227, 332, 554, light, vec3d{0, -1, 0}));
+  objects.add(make_shared<xz_rectangle>(213, 343, 227, 332, 554, light,
+                                        vec3d{0, -1, 0}));
   objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 0, white));
-  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white, vec3d{0, -1, 0}));
+  objects.add(
+      make_shared<xz_rectangle>(0, 555, 0, 555, 555, white, vec3d{0, -1, 0}));
   objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
 
+  // shared_ptr<base_material> aluminum =
+  //     make_shared<metal>(color_rgb(0.8, 0.85, 0.88), 0.0);
+  // shared_ptr<base_object> box1 =
+  //     make_shared<box>(point3d(0, 0, 0), point3d(165, 330, 165), aluminum);
   shared_ptr<base_object> box1 =
       make_shared<box>(point3d(0, 0, 0), point3d(165, 330, 165), white);
   box1 = make_shared<rotate_y>(box1, 15);
@@ -128,6 +133,8 @@ object_list cornell_box() {
   box2 = make_shared<translate>(box2, vec3d(130, 0, 65));
   objects.add(box2);
 
+  // auto glass = make_shared<dielectric>(1.5);
+  // objects.add(make_shared<sphere>(point3d(190, 90, 190), 90, glass));
   return objects;
 }
 object_list cornell_smoke() {
@@ -162,9 +169,11 @@ object_list cornell_smoke() {
 }
 object_list earth() {
   object_list objects;
-  auto earth_texture = make_shared<image_texture>("./src/appearance/earthmap.jpg");
+  auto earth_texture =
+      make_shared<image_texture>("./src/appearance/earthmap.jpg");
   auto earth_surface = make_shared<lambertian>(earth_texture);
-  // auto default_mat = make_shared<lambertian_material>(color_rgb{0.7, 0.8, 0.9});
+  // auto default_mat = make_shared<lambertian_material>(color_rgb{0.7, 0.8,
+  // 0.9});
   auto globe = make_shared<sphere>(point3d{0, 0, 0}, 2, earth_surface);
   objects.add(globe);
   // a light
@@ -209,9 +218,9 @@ object_list final_scene() {
   objects.add(make_shared<sphere>(point3d(260, 150, 45), 50,
                                   make_shared<dielectric>(1.5)));
   // a gray metal sphere on right corner
-  objects.add(make_shared<sphere>(
-      point3d(0, 150, 145), 50,
-      make_shared<metal>(color_rgb(0.8, 0.8, 0.9), 1.0)));
+  objects.add(
+      make_shared<sphere>(point3d(0, 150, 145), 50,
+                          make_shared<metal>(color_rgb(0.8, 0.8, 0.9), 1.0)));
   // a transparent sphere, with blue smoke in it
   auto boundary = make_shared<sphere>(point3d(360, 150, 145), 70,
                                       make_shared<dielectric>(1.5));
@@ -219,12 +228,13 @@ object_list final_scene() {
   objects.add(
       make_shared<constant_medium>(boundary, 0.02, color_rgb(0.2, 0.4, 0.9)));
   // a huge sphere with thin smoke, as the whole atmosphere
-  boundary = make_shared<sphere>(point3d(0, 0, 0), 5000,
-                                 make_shared<dielectric>(1.5));
+  boundary =
+      make_shared<sphere>(point3d(0, 0, 0), 5000, make_shared<dielectric>(1.5));
   objects.add(
       make_shared<constant_medium>(boundary, .0001, color_rgb(1, 1, 1)));
   // image texture, the earth
-  auto earth_texture = make_shared<image_texture>("./src/appearance/earthmap.jpg");
+  auto earth_texture =
+      make_shared<image_texture>("./src/appearance/earthmap.jpg");
   auto earth_surface = make_shared<lambertian>(earth_texture);
   auto globe = make_shared<sphere>(point3d{400, 200, 400}, 100, earth_surface);
   objects.add(globe);

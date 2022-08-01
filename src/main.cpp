@@ -23,35 +23,43 @@ constexpr int JPG_OUT = 1;
  * cast a ray to the world and get its color
  */
 color_rgb ray_color(ray const &r_in, color_rgb const &background,
-                    base_object const &world, shared_ptr<base_object> &lights,
+                    base_object const &world, shared_ptr<base_object> lights,
                     int bounce_depth) {
-  /******** Objects ********/
-  hit_record rec;
+  hit_record h_rec;
+
   // if ray reaches max bounce it gets nothing
   if (bounce_depth <= 0) return color_rgb{0, 0, 0};
   // if ray does not hit anything it gets backround color
-  if (!world.hit(r_in, 0.001, INF_DBL, rec)) return background;
-  // shading are handled by object_list
-  ray scattered;
-  color_rgb attenuation;
-  color_rgb emit_color = rec.mat_ptr->emit(r_in, rec, rec.u, rec.v, rec.p);
-  double sample_pdf;
+  if (!world.hit(r_in, 0.001, INF_DBL, h_rec)) return background;
+
+  scatter_record s_rec;
+  color_rgb emit_color =
+      h_rec.mat_ptr->emit(r_in, h_rec, h_rec.u, h_rec.v, h_rec.p);
+
   // if the material scatters light this ray gets scatter and emit
-  if (!rec.mat_ptr->scatter(r_in, rec, attenuation, scattered, sample_pdf))
-    return emit_color;
+  if (!h_rec.mat_ptr->scatter(r_in, h_rec, s_rec)) return emit_color;
 
-  auto p0 = make_shared<obj_pdf>(lights, rec.p);
-  auto p1 = make_shared<cosine_pdf>(rec.normal);
-  mixture_pdf mixed_pdf{p0, p1, 0.};
+  // clang-format off
+  if (s_rec.is_specular) {
+    return s_rec.attenuation
+            * ray_color(s_rec.ray_specular, background, world,
+                        lights,             bounce_depth - 1);
+  }
+  // clang-format on
 
-  scattered = ray{rec.p, mixed_pdf.generate(), r_in.time()};
-  sample_pdf = mixed_pdf.value(scattered.direction());
+  auto light_pdf_ptr = make_shared<obj_pdf>(lights, h_rec.p);
+  // mixture importance sampling
+  mixture_pdf sample_pdf{light_pdf_ptr, s_rec.pdf_ptr, 0.5};
+
+  ray scattered = ray{h_rec.p, sample_pdf.generate(), r_in.time()};
+  auto sample_pdf_val = sample_pdf.value(scattered.direction());
 
   // clang-format off
   return emit_color
-         + attenuation * rec.mat_ptr->scatter_pdf(r_in, rec, scattered)
-                       * ray_color(scattered, background, world,
-                                   lights,    bounce_depth - 1) / sample_pdf;
+         + s_rec.attenuation
+            * h_rec.mat_ptr->scatter_pdf(r_in, h_rec, scattered)
+            * ray_color(scattered, background, world,
+                        lights,    bounce_depth - 1) / sample_pdf_val;
   // clang-format on
 }
 int main(int argc, char *argv[]) {
@@ -121,7 +129,7 @@ int main(int argc, char *argv[]) {
 
       aspect_ratio = 1.0;
       image_w = 500;
-      spp = 1000;
+      spp = 100;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
 
@@ -175,8 +183,11 @@ int main(int argc, char *argv[]) {
 
   /******** Render ********/
   bvh_node world_bvh{world, apt_open, apt_close};
-  shared_ptr<base_object> lights = make_shared<xz_rectangle>(
-      213, 343, 227, 332, 554, shared_ptr<base_material>());
+  auto lights = make_shared<object_list>();
+  lights->add(make_shared<xz_rectangle>(213, 343, 227, 332, 554,
+                                        shared_ptr<base_material>()));
+  // lights->add(make_shared<sphere>(point3d{190, 190, 190}, 90,
+  //                                 shared_ptr<base_material>()));
 
   char *data;
   if (OUT_FORMAT == JPG_OUT)

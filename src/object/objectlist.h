@@ -6,7 +6,7 @@
 
 #include "baseobject.h"
 
-class object_list : public base_object{
+class object_list : public base_object {
  public:
   std::vector<std::shared_ptr<base_object>> objects_;
 
@@ -21,6 +21,9 @@ class object_list : public base_object{
                             aabb& buf_aabb) const override;
   virtual void get_uv(double const t, point3d const& p, double& u,
                       double& v) const override;
+  virtual double pdf_value(point3d const& origin,
+                           vec3d const& dir) const override;
+  virtual vec3d random_sample(point3d const& origin) const override;
 };
 
 bool object_list::hit(const ray& r, double t_min, double t_max,
@@ -54,5 +57,20 @@ void object_list::get_uv(double const t, point3d const& p, double& u,
                          double& v) const {
   // just a placeholder
   std::cerr << "object_list::get_uv: This class cannot get uv.\n";
+}
+
+double object_list::pdf_value(point3d const& origin, vec3d const& dir) const {
+  // uniform distribution
+  auto weight = 1.0 / objects_.size();
+  auto sum = 0.0;
+  for (auto const& obj : objects_) {
+    sum += obj->pdf_value(origin, dir);
+  }
+  return sum * weight;
+}
+vec3d object_list::random_sample(point3d const& origin) const {
+  // sample all objects equally
+  auto obj_num = static_cast<int>(objects_.size());
+  return objects_[random_int(0, obj_num)]->random_sample(origin);
 }
 #endif
