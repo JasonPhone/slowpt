@@ -10,7 +10,7 @@ class pdf {
  public:
   virtual ~pdf() {}
   virtual double value(vec3d const &dir) const = 0;
-  virtual vec3d generate() const = 0;
+  virtual vec3d generate( double t) const = 0;
 };
 
 class cosine_pdf : public pdf {
@@ -23,7 +23,7 @@ class cosine_pdf : public pdf {
     auto cosine = dot(this->uvw_.w(), unit_vector(dir));
     return cosine < 0 ? 0 : cosine / PI;
   }
-  virtual vec3d generate() const override {
+  virtual vec3d generate(double t) const override {
     return uvw_.local(random_cosine_on_sphere());
   }
 };
@@ -38,8 +38,8 @@ class obj_pdf : public pdf {
   virtual double value(vec3d const &dir) const override {
     return obj_ptr_->pdf_value(this->origin_, dir);
   }
-  virtual vec3d generate() const override {
-    return obj_ptr_->random_sample(this->origin_);
+  virtual vec3d generate(double t) const override {
+    return obj_ptr_->random_sample(this->origin_, t);
   }
 };
 
@@ -64,9 +64,9 @@ class mixture_pdf : public pdf {
   virtual double value(vec3d const &dir) const override {
     return t_ * p_[0]->value(dir) + (1.0 - t_) * p_[1]->value(dir);
   }
-  virtual vec3d generate() const override {
-    if (random_double() < t_) return p_[0]->generate();
-    return p_[1]->generate();
+  virtual vec3d generate(double t) const override {
+    if (random_double() < t_) return p_[0]->generate(t);
+    return p_[1]->generate(t);
   }
 };
 

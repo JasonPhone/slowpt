@@ -51,7 +51,7 @@ color_rgb ray_color(ray const &r_in, color_rgb const &background,
   // mixture importance sampling
   mixture_pdf sample_pdf{light_pdf_ptr, s_rec.pdf_ptr, 0.5};
 
-  ray scattered = ray{h_rec.p, sample_pdf.generate(), r_in.time()};
+  ray scattered = ray{h_rec.p, sample_pdf.generate(r_in.time()), r_in.time()};
   auto sample_pdf_val = sample_pdf.value(scattered.direction());
 
   // clang-format off
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
 
       aspect_ratio = 1.0;
       image_w = 500;
-      spp = 100;
+      spp = 20000;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
 
@@ -186,8 +186,8 @@ int main(int argc, char *argv[]) {
   auto lights = make_shared<object_list>();
   lights->add(make_shared<xz_rectangle>(213, 343, 227, 332, 554,
                                         shared_ptr<base_material>()));
-  // lights->add(make_shared<sphere>(point3d{190, 190, 190}, 90,
-  //                                 shared_ptr<base_material>()));
+  lights->add(make_shared<sphere>(point3d{190, 190, 190}, 90,
+                                  shared_ptr<base_material>()));
 
   char *data;
   if (OUT_FORMAT == JPG_OUT)

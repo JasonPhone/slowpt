@@ -20,7 +20,7 @@ class sphere : public base_object {
    * in time0 and time1
    */
   sphere(const vec3d& cent0, const vec3d& cent1, double tm0, double tm1,
-                double r, std::shared_ptr<base_material> m)
+         double r, std::shared_ptr<base_material> m)
       : base_object{},
         center0_{cent0},
         center1_{cent1},
@@ -34,12 +34,15 @@ class sphere : public base_object {
                             aabb& buf_aabb) const override;
   virtual void get_uv(double const t, point3d const& p, double& u,
                       double& v) const override;
+  virtual double pdf_value(point3d const& origin,
+                           vec3d const& dir) const override;
+  virtual vec3d random_sample(vec3d const& origin, double t) const override;
   vec3d center(double time) const;
   double radius() const;
 };
 
 bool sphere::hit(const ray& r, double t_min, double t_max,
-                        hit_record& rec) const {
+                 hit_record& rec) const {
   vec3d oc = r.origin() - center(r.time());  // ray origin to sphere center
   // solve the intersect equation
   auto a = r.direction().norm2();
@@ -89,7 +92,7 @@ vec3d sphere::center(double time) const {
 }
 double sphere::radius() const { return this->radius_; }
 void sphere::get_uv(double const t, point3d const& p, double& u,
-                           double& v) const {
+                    double& v) const {
   /**
    * u (longtitude) v (latitude) coordinate is set as:
    *  a point on a unit sphere(center at origin)
@@ -106,5 +109,23 @@ void sphere::get_uv(double const t, point3d const& p, double& u,
   auto phi = atan2(-p.z(), p.x()) + PI;
   u = phi / (2 * PI);
   v = theta / PI;
+}
+double sphere::pdf_value(point3d const& origin, vec3d const& dir) const {
+  hit_record rec;
+  if (!this->hit(ray(origin, dir), 0.001, INF_DBL, rec)) return 0;
+
+  auto cos_theta_max =
+      sqrt(1 - radius_ * radius_ / (center(rec.t) - origin).norm2());
+  auto solid_angle = 2 * PI * (1 - cos_theta_max);
+
+  return 1 / solid_angle;
+}
+
+vec3d sphere::random_sample(point3d const& origin, double t) const {
+  vec3d direction = center(t) - origin;
+  auto distance_squared = direction.norm2();
+  onb uvw;
+  uvw.build_from_w(direction);
+  return uvw.local(random_to_sphere(radius_, distance_squared));
 }
 #endif

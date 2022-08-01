@@ -12,6 +12,10 @@ void write_color(std::ostream &out, color_rgb const &pixel_color, int spp) {
   auto r = pixel_color.x();
   auto g = pixel_color.y();
   auto b = pixel_color.z();
+  // check NaN
+  r = r == r ? r : 0;
+  g = g == g ? g : 0;
+  b = b == b ? b : 0;
   // average
   auto scale = 1.0 / spp;
   // gamma
@@ -43,6 +47,10 @@ void write_color(char *data, color_rgb const &pixel_color, int spp, int w,
   auto r = pixel_color.x();
   auto g = pixel_color.y();
   auto b = pixel_color.z();
+  // check NaN
+  r = r == r ? r : 0;
+  g = g == g ? g : 0;
+  b = b == b ? b : 0;
   auto scale = 1.0 / spp;
   r = std::sqrt(scale * r);
   g = std::sqrt(scale * g);

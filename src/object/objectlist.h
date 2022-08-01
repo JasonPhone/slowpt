@@ -23,7 +23,7 @@ class object_list : public base_object {
                       double& v) const override;
   virtual double pdf_value(point3d const& origin,
                            vec3d const& dir) const override;
-  virtual vec3d random_sample(point3d const& origin) const override;
+  virtual vec3d random_sample(point3d const& origin, double t) const override;
 };
 
 bool object_list::hit(const ray& r, double t_min, double t_max,
@@ -68,9 +68,9 @@ double object_list::pdf_value(point3d const& origin, vec3d const& dir) const {
   }
   return sum * weight;
 }
-vec3d object_list::random_sample(point3d const& origin) const {
+vec3d object_list::random_sample(point3d const& origin, double t) const {
   // sample all objects equally
   auto obj_num = static_cast<int>(objects_.size());
-  return objects_[random_int(0, obj_num)]->random_sample(origin);
+  return objects_[random_int(0, obj_num)]->random_sample(origin, t);
 }
 #endif

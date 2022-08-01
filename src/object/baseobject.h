@@ -36,7 +36,7 @@ class base_object {
   virtual double pdf_value(point3d const &origin, vec3d const &direction) const {
     return 0.0;
   }
-  virtual vec3d random_sample(vec3d const &origin) const {
+  virtual vec3d random_sample(vec3d const &origin, double t) const {
     return vec3d{1, 0, 0};
   }
 };
