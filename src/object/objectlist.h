@@ -60,6 +60,7 @@ void object_list::get_uv(double const t, point3d const& p, double& u,
 }
 
 double object_list::pdf_value(point3d const& origin, vec3d const& dir) const {
+  if (objects_.empty()) return 0.;
   // uniform distribution
   auto weight = 1.0 / objects_.size();
   auto sum = 0.0;
@@ -69,6 +70,7 @@ double object_list::pdf_value(point3d const& origin, vec3d const& dir) const {
   return sum * weight;
 }
 vec3d object_list::random_sample(point3d const& origin, double t) const {
+  if (objects_.empty()) return vec3d{0, 1, 0};
   // sample all objects equally
   auto obj_num = static_cast<int>(objects_.size());
   return objects_[random_int(0, obj_num)]->random_sample(origin, t);

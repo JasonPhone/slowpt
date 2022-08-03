@@ -49,7 +49,7 @@ color_rgb ray_color(ray const &r_in, color_rgb const &background,
 
   auto light_pdf_ptr = make_shared<obj_pdf>(lights, h_rec.p);
   // mixture importance sampling
-  mixture_pdf sample_pdf{light_pdf_ptr, s_rec.pdf_ptr, 0.5};
+  mixture_pdf sample_pdf{light_pdf_ptr, s_rec.pdf_ptr, -0.5};
 
   ray scattered = ray{h_rec.p, sample_pdf.generate(r_in.time()), r_in.time()};
   auto sample_pdf_val = sample_pdf.value(scattered.direction());
@@ -83,8 +83,8 @@ int main(int argc, char *argv[]) {
   color_rgb background_color{0, 0, 0};
 
   /******** Objects wolrd ********/
-  // object_list world;
   object_list world;
+  auto lights = make_shared<object_list>();
   /******** Camera ********/
   point3d lookfrom{13, 2, 3};
   point3d lookat{0, 0, 0};
@@ -126,10 +126,14 @@ int main(int argc, char *argv[]) {
       break;
     case 6:
       world = cornell_box();
+      lights->add(make_shared<xz_rectangle>(213, 343, 227, 332, 554,
+                                            shared_ptr<base_material>()));
+      lights->add(make_shared<sphere>(point3d{190, 190, 190}, 90,
+                                      shared_ptr<base_material>()));
 
       aspect_ratio = 1.0;
       image_w = 500;
-      spp = 20000;
+      spp = 2000;
       max_bounce = 50;
       background_color = color_rgb(0, 0, 0);
 
@@ -145,12 +149,24 @@ int main(int argc, char *argv[]) {
       break;
     case 7:
       world = cornell_smoke();
+      lights->add(make_shared<xz_rectangle>(113, 443, 127, 432, 554,
+                                            shared_ptr<base_material>()));
+
       aspect_ratio = 1.0;
-      image_w = 600;
+      image_w = 500;
       spp = 200;
+      max_bounce = 50;
+      background_color = color_rgb(0, 0, 0);
+
       lookfrom = point3d(278, 278, -800);
       lookat = point3d(278, 278, 0);
+      vup = vec3d{0, 1, 0};
+      dist_to_focus = 10.0;
+      aperture = 0.0;
       vfov = 40.0;
+
+      apt_open = 0.0;
+      apt_close = 1.0;
       break;
     case 8:
       world = final_scene();
@@ -183,11 +199,6 @@ int main(int argc, char *argv[]) {
 
   /******** Render ********/
   bvh_node world_bvh{world, apt_open, apt_close};
-  auto lights = make_shared<object_list>();
-  lights->add(make_shared<xz_rectangle>(213, 343, 227, 332, 554,
-                                        shared_ptr<base_material>()));
-  lights->add(make_shared<sphere>(point3d{190, 190, 190}, 90,
-                                  shared_ptr<base_material>()));
 
   char *data;
   if (OUT_FORMAT == JPG_OUT)

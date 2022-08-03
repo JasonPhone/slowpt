@@ -178,16 +178,17 @@ class isotropic_medium : public base_material {
  public:
   isotropic_medium(color_rgb clr) : albedo_{make_shared<solid_texture>(clr)} {}
   isotropic_medium(shared_ptr<texture> text) : albedo_{text} {}
-  // virtual bool scatter(const ray& r_in, const hit_record& rec,
-  //                      color_rgb& attenuation, ray& scattered,
-  //                      double& sample_pdf) const override {
-  //   // in all random direction
-  //   scattered = ray{rec.p, random_in_unit_sphere(), r_in.time()};
-  //   // just the albedo
-  //   attenuation = albedo_->value(rec.u, rec.v, rec.p);
-  //   return true;
-  // }
-  // This fog does not emit light
+  virtual bool scatter(const ray& r_in, const hit_record& h_rec,
+                       scatter_record& s_rec) const override {
+    s_rec.is_specular = false;
+    s_rec.attenuation = albedo_->value(h_rec.u, h_rec.v, h_rec.p);
+    s_rec.pdf_ptr = make_shared<on_sphere_pdf>();
+    return true;
+  }
+  virtual double scatter_pdf(ray const& r_in, hit_record const& h_rec,
+                             ray const& scattered) const override {
+    return 0.25 / PI;
+  }
 };
 
 #endif

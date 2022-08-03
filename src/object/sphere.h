@@ -110,6 +110,7 @@ void sphere::get_uv(double const t, point3d const& p, double& u,
   u = phi / (2 * PI);
   v = theta / PI;
 }
+// TODO implemention need check
 double sphere::pdf_value(point3d const& origin, vec3d const& dir) const {
   hit_record rec;
   if (!this->hit(ray(origin, dir), 0.001, INF_DBL, rec)) return 0;

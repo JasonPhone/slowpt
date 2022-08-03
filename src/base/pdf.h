@@ -10,7 +10,7 @@ class pdf {
  public:
   virtual ~pdf() {}
   virtual double value(vec3d const &dir) const = 0;
-  virtual vec3d generate( double t) const = 0;
+  virtual vec3d generate(double t) const = 0;
 };
 
 class cosine_pdf : public pdf {
@@ -43,6 +43,16 @@ class obj_pdf : public pdf {
   }
 };
 
+class on_sphere_pdf : public pdf {
+ private:
+ public:
+  on_sphere_pdf() {}
+  virtual double value(vec3d const &dir) const override { return 0.25 / PI; }
+  virtual vec3d generate(double t) const override {
+    return random_unit_vector();
+  }
+};
+
 class mixture_pdf : public pdf {
  private:
   shared_ptr<pdf> p_[2];
@@ -59,7 +69,7 @@ class mixture_pdf : public pdf {
   mixture_pdf(shared_ptr<pdf> p0, shared_ptr<pdf> p1, double t) {
     p_[0] = p0;
     p_[1] = p1;
-    t_ = t;
+    t_ = clamp(t, 0, 1);
   }
   virtual double value(vec3d const &dir) const override {
     return t_ * p_[0]->value(dir) + (1.0 - t_) * p_[1]->value(dir);

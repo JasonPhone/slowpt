@@ -147,9 +147,11 @@ object_list cornell_smoke() {
 
   objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 555, green));
   objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 0, red));
-  objects.add(make_shared<xz_rectangle>(113, 443, 127, 432, 554, light));
-  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 555, white));
+  objects.add(make_shared<xz_rectangle>(113, 443, 127, 432, 554, light,
+                                        vec3d{0, -1, 0}));
   objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 0, white));
+  objects.add(
+      make_shared<xz_rectangle>(0, 555, 0, 555, 555, white, vec3d{0, -1, 0}));
   objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
 
   shared_ptr<base_object> box1 =
@@ -163,7 +165,9 @@ object_list cornell_smoke() {
   box2 = make_shared<translate>(box2, vec3d(130, 0, 65));
 
   objects.add(make_shared<constant_medium>(box1, 0.01, color_rgb(0, 0, 0)));
+  // objects.add(box1);
   objects.add(make_shared<constant_medium>(box2, 0.01, color_rgb(1, 1, 1)));
+  // objects.add(box2);
 
   return objects;
 }
