@@ -56,19 +56,19 @@ bool constant_medium::hit(const ray& r, double t_min, double t_max,
   // NOTE Is this necessary after clamp?
   if (rec1.t < 0) rec1.t = 0;
   // Use norm of direction as the speed
-  const auto ray_length = r.direction().norm();
+  const auto ray_spd = r.direction().norm();
   // dis_inside_boundary is the distance from in to out
   // Works ONLY when the medium is a convex
-  const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
+  const auto distance_inside_boundary = (rec2.t - rec1.t) * ray_spd;
   // A random function to assume the scatter distance
   // log uses e as base
   const auto hit_distance = neg_inv_density_ * log(random_double());
-  // If the ray hit so deep that it goes through the medium
+  // If the ray hit so deep that it goes out the medium
   // it will be a false hit
   if (hit_distance > distance_inside_boundary) return false;
   // We now think the ray hits the medium at rec1 with hit_dis depth,
   // and set the time
-  rec.t = rec1.t + hit_distance / ray_length;
+  rec.t = rec1.t + hit_distance / ray_spd;
   rec.p = r.at(rec.t);
 
   if (debugging) {

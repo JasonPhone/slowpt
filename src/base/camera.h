@@ -7,7 +7,7 @@
 class camera {
  private:
   point3d origin_, lower_left_;
-  vec3d hori_side_, vert_side_;
+  vec3d hori_edge_, vert_edge_;
   vec3d u_, v_, w_;
   double lens_radius_;
   double open_time_, close_time_;
@@ -34,10 +34,10 @@ class camera {
 
     origin_ = lookfrom;
     // enlarge the plane by focus_distance (trigonometry)
-    hori_side_ = viewport_w * u_ * focus_dist;
-    vert_side_ = viewport_h * v_ * focus_dist;
+    hori_edge_ = viewport_w * u_ * focus_dist;
+    vert_edge_ = viewport_h * v_ * focus_dist;
     // subtract because it's negative z-axis
-    lower_left_ = origin_ - hori_side_ / 2 - vert_side_ / 2 - w_ * focus_dist;
+    lower_left_ = origin_ - hori_edge_ / 2 - vert_edge_ / 2 - w_ * focus_dist;
     lens_radius_ = aperture / 2;
 
     // shutter time
@@ -50,7 +50,7 @@ class camera {
     vec3d offset = u_ * rd.x() + v_ * rd.y();
     vec3d origin_new = origin_ + offset;
     return ray{origin_new,
-               lower_left_ + s * hori_side_ + t * vert_side_ - origin_new,
+               lower_left_ + s * hori_edge_ + t * vert_edge_ - origin_new,
                random_double(open_time_, close_time_)};
   }
 };
