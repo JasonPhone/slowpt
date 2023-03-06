@@ -1,6 +1,6 @@
 /* encoding issue
 in windows
-.\build\slowpt.exe | Out-File ./image.ppm -Encoding ascii
+.\build\slowpt.exe 2 | Out-File ./image.ppm -Encoding ascii
 in linux
 ./build/slowpt > out.ppm
 */
@@ -68,10 +68,12 @@ int main(int argc, char *argv[]) {
   int OUT_FORMAT = PPM_OUT;
   if (argc > 1) {
     scene_idx = atoi(argv[1]);
+    std::cout << "Scene index: " << scene_idx << std::endl;
   }
   if (argc > 2) {
     path = argv[2];
     OUT_FORMAT = JPG_OUT;
+    std::cout << "Output as jpg" << std::endl;
   }
 
   std::srand(std::time(nullptr));
@@ -185,6 +187,29 @@ int main(int argc, char *argv[]) {
       lookat = point3d{0, 0, 0};
       background_color = color_rgb(0, 0, 0);
       vfov = 40.0;
+      break;
+    case 10:
+      world = cornell_glass();
+      lights->add(make_shared<xz_rectangle>(213, 343, 227, 332, 554,
+                                            shared_ptr<base_material>()));
+      lights->add(make_shared<sphere>(point3d{190, 190, 190}, 90,
+                                      shared_ptr<base_material>()));
+
+      aspect_ratio = 1.0;
+      image_w = 800;
+      spp = 4000;
+      max_bounce = 50;
+      background_color = color_rgb(0, 0, 0);
+
+      lookfrom = point3d(278, 278, -800);
+      lookat = point3d(278, 278, 0);
+      vup = vec3d{0, 1, 0};
+      dist_to_focus = 10.0;
+      aperture = 0.0;
+      vfov = 40.0;
+
+      apt_open = 0.0;
+      apt_close = 1.0;
       break;
     default:
       world = one_sphere();

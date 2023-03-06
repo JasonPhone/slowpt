@@ -137,6 +137,43 @@ object_list cornell_box() {
   objects.add(make_shared<sphere>(point3d(190, 90, 190), 90, glass));
   return objects;
 }
+object_list cornell_glass() {
+  object_list objects;
+
+  auto red = make_shared<lambertian>(color_rgb(.65, .05, .05));
+  auto white = make_shared<lambertian>(color_rgb(.73, .73, .73));
+  auto green = make_shared<lambertian>(color_rgb(.12, .45, .15));
+  auto light = make_shared<diffuse_light>(color_rgb(15, 15, 15));
+
+  objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 555, green));
+  objects.add(make_shared<yz_rectangle>(0, 555, 0, 555, 0, red));
+  objects.add(make_shared<xz_rectangle>(213, 343, 227, 332, 554, light,
+                                        vec3d{0, -1, 0}));
+  objects.add(make_shared<xz_rectangle>(0, 555, 0, 555, 0, white));
+  objects.add(
+      make_shared<xz_rectangle>(0, 555, 0, 555, 555, white, vec3d{0, -1, 0}));
+  objects.add(make_shared<xy_rectangle>(0, 555, 0, 555, 555, white));
+
+  auto glass = make_shared<dielectric>(1.5);
+  // shared_ptr<base_material> aluminum =
+  //     make_shared<metal>(color_rgb(0.8, 0.85, 0.88), 0.0);
+  // shared_ptr<base_object> box1 =
+  //     make_shared<box>(point3d(0, 0, 0), point3d(165, 330, 165), aluminum);
+  shared_ptr<base_object> box1 =
+      make_shared<box>(point3d(0, 0, 0), point3d(165, 330, 165), glass);
+  box1 = make_shared<rotate_y>(box1, 15);
+  box1 = make_shared<translate>(box1, vec3d(265, 0, 295));
+  objects.add(box1);
+
+  // shared_ptr<base_object> box2 =
+  //     make_shared<box>(point3d(0, 0, 0), point3d(165, 165, 165), glass);
+  // box2 = make_shared<rotate_y>(box2, -18);
+  // box2 = make_shared<translate>(box2, vec3d(130, 0, 65));
+  // objects.add(box2);
+
+  objects.add(make_shared<sphere>(point3d(190, 90, 190), 90, glass));
+  return objects;
+}
 object_list cornell_smoke() {
   object_list objects;
 
